@@ -1,11 +1,14 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const initialForm = {
   name: '',
   email: '',
   password: '',
+  confirmPassword: '',
 };
+
+const USER_STORAGE_KEY = 'car-marketplace-user';
 
 const trustPoints = [
   'New deals added every day',
@@ -14,6 +17,7 @@ const trustPoints = [
 ];
 
 function SignupPage() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState(initialForm);
   const [status, setStatus] = useState({
     loading: false,
@@ -21,8 +25,19 @@ function SignupPage() {
     success: '',
   });
 
+  const formIsComplete =
+    formData.name.trim() &&
+    formData.email.trim() &&
+    formData.password &&
+    formData.confirmPassword;
+
   function handleChange(event) {
     const { name, value } = event.target;
+
+    setStatus((current) => ({
+      ...current,
+      error: '',
+    }));
 
     setFormData((current) => ({
       ...current,
@@ -30,8 +45,39 @@ function SignupPage() {
     }));
   }
 
+  function validateForm() {
+    const trimmedName = formData.name.trim();
+    const trimmedEmail = formData.email.trim();
+
+    if (!trimmedName || !trimmedEmail || !formData.password || !formData.confirmPassword) {
+      return 'Please fill in all signup fields';
+    }
+
+    if (formData.password.length < 6) {
+      return 'Password must be at least 6 characters';
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      return 'Passwords do not match';
+    }
+
+    return '';
+  }
+
   async function handleSubmit(event) {
     event.preventDefault();
+
+    const validationMessage = validateForm();
+
+    if (validationMessage) {
+      setStatus({
+        loading: false,
+        error: validationMessage,
+        success: '',
+      });
+
+      return;
+    }
 
     setStatus({
       loading: true,
@@ -40,27 +86,39 @@ function SignupPage() {
     });
 
     try {
+      const payload = {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        password: formData.password,
+      };
+
       const response = await fetch('/api/users/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
         throw new Error(data.message || 'Unable to create account');
       }
 
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(data));
+
       setStatus({
         loading: false,
         error: '',
-        success: `Welcome, ${data.name}. Your account has been created.`,
+        success: `Welcome, ${data.name}. Your account has been created. Redirecting you now...`,
       });
 
       setFormData(initialForm);
+
+      window.setTimeout(() => {
+        navigate('/inventory');
+      }, 1400);
     } catch (error) {
       setStatus({
         loading: false,
@@ -161,10 +219,33 @@ function SignupPage() {
             />
           </label>
 
+          <label className="field">
+            <span>Confirm password</span>
+            <input
+              type="password"
+              name="confirmPassword"
+              placeholder="Repeat your password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+              minLength="6"
+            />
+          </label>
+
+          <div className="signup-helper-row">
+            <p className="signup-helper-text">
+              {formData.password && formData.confirmPassword
+                ? formData.password === formData.confirmPassword
+                  ? 'Passwords match and are ready to submit.'
+                  : 'Make sure both password fields match.'
+                : 'Use at least 6 characters for your password.'}
+            </p>
+          </div>
+
           <button
             type="submit"
             className="signup-submit"
-            disabled={status.loading}
+            disabled={status.loading || !formIsComplete}
           >
             {status.loading ? 'Creating account...' : 'Create my account'}
           </button>
