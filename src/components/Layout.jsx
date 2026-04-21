@@ -1,85 +1,99 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 
-const navLinks = [
+const primaryLinks = [
   { to: '/', label: 'Home', end: true },
   { to: '/inventory', label: 'Inventory' },
-  { to: '/signin', label: 'Signin' },
-  { to: '/signup', label: 'Signup' },
   { to: '/about', label: 'About' },
 ];
 
 function Layout() {
   const { isAuthenticated, signout, userInfo } = useAppContext();
+  const sessionLabel = isAuthenticated
+    ? `Welcome back, ${userInfo?.name?.split(' ')[0] || 'Driver'}`
+    : 'Guest session';
+  const sessionText = isAuthenticated
+    ? userInfo?.email
+    : 'Sign in to keep your account synced across the marketplace.';
 
   return (
     <div className="app-shell">
       <header className="site-header">
         <div className="container">
           <div className="header-panel">
+            <div className="header-meta">
+              <span className="header-status-pill">Marketplace Live</span>
+              <span className="header-session-chip">{sessionLabel}</span>
+            </div>
+
             <div className="header-content">
-              <NavLink to="/" className="brand" aria-label="Car Marketplace home">
-                <span className="brand-mark">CM</span>
-                <span className="brand-copy">
-                  <span className="brand-title">Car Marketplace</span>
-                  <span className="brand-subtitle">Premium car listing starter</span>
-                </span>
-              </NavLink>
-
-              <nav className="main-nav" aria-label="Primary navigation">
-                {navLinks.map((link) => (
-                  <NavLink
-                    key={link.to}
-                    to={link.to}
-                    end={link.end}
-                    className={({ isActive }) =>
-                      isActive ? 'nav-link nav-link-active' : 'nav-link'
-                    }
-                  >
-                    {link.label}
-                  </NavLink>
-                ))}
-              </nav>
-
-              {isAuthenticated ? (
-                <div className="header-user-panel">
-                  <div className="header-user-copy">
-                    <span className="header-user-label">Signed in</span>
-                    <strong>{userInfo?.name}</strong>
-                  </div>
-
-                  <button type="button" className="header-signout" onClick={signout}>
-                    Sign out
-                  </button>
-                </div>
-              ) : (
-                <NavLink to="/signup" className="header-cta">
-                  Create Account
+              <div className="header-brand-group">
+                <NavLink to="/" className="brand" aria-label="Car Marketplace home">
+                  <span className="brand-mark">CM</span>
+                  <span className="brand-copy">
+                    <span className="brand-title">Car Marketplace</span>
+                    <span className="brand-subtitle">
+                      Premium browsing, clean auth, and a sharper buying flow
+                    </span>
+                  </span>
                 </NavLink>
-              )}
+
+                <p className="header-caption">{sessionText}</p>
+              </div>
+
+              <div className="header-nav-group">
+                <nav className="main-nav" aria-label="Primary navigation">
+                  {primaryLinks.map((link) => (
+                    <NavLink
+                      key={link.to}
+                      to={link.to}
+                      end={link.end}
+                      className={({ isActive }) =>
+                        isActive ? 'nav-link nav-link-active' : 'nav-link'
+                      }
+                    >
+                      {link.label}
+                    </NavLink>
+                  ))}
+
+                  {!isAuthenticated ? (
+                    <NavLink
+                      to="/signin"
+                      className={({ isActive }) =>
+                        isActive ? 'nav-link nav-link-active' : 'nav-link'
+                      }
+                    >
+                      Signin
+                    </NavLink>
+                  ) : null}
+                </nav>
+
+                <div className="header-actions">
+                  <NavLink to="/inventory" className="header-secondary-cta">
+                    Browse Cars
+                  </NavLink>
+
+                  {isAuthenticated ? (
+                    <button
+                      type="button"
+                      className="header-signout"
+                      onClick={signout}
+                    >
+                      Sign out
+                    </button>
+                  ) : (
+                    <NavLink to="/signup" className="header-cta">
+                      Create Account
+                    </NavLink>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </header>
 
       <main className="container page-content">
-        <section className="session-banner">
-          <div className="session-banner-copy">
-            <span className="session-banner-label">Session status</span>
-            <strong>
-              {isAuthenticated
-                ? `Logged in as ${userInfo?.name}`
-                : 'Browsing as guest'}
-            </strong>
-          </div>
-
-          <p className="session-banner-text">
-            {isAuthenticated
-              ? userInfo?.email
-              : 'Create an account or sign in to keep your user state in local storage.'}
-          </p>
-        </section>
-
         <Outlet />
       </main>
     </div>
