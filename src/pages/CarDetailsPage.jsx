@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { useAppContext } from '../context/AppContext';
 import { fetchListingById } from '../utils/listingApi';
 import { formatMileage, formatPrice, getListingTitle } from '../utils/listings';
 
 function CarDetailsPage() {
   const { carId = '' } = useParams();
+  const { userInfo } = useAppContext();
   const [listing, setListing] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [status, setStatus] = useState({
@@ -70,11 +72,18 @@ function CarDetailsPage() {
     );
   }
 
+  const isOwner = userInfo?._id && userInfo._id === listing.owner?._id;
+
   return (
     <section className="listing-details-layout">
       <article className="details-card">
         <span className="eyebrow">Vehicle details</span>
         <h1>{getListingTitle(listing)}</h1>
+
+        <div className="listing-detail-topbar">
+          <span className="inventory-price">{formatPrice(listing.price)}</span>
+          <span className="listing-status-pill">{listing.status}</span>
+        </div>
 
         {listing.images?.length ? (
           <div className="listing-slider">
@@ -143,6 +152,25 @@ function CarDetailsPage() {
           </div>
         )}
 
+        <div className="listing-highlight-strip">
+          <div>
+            <strong>{listing.year}</strong>
+            <span>Year</span>
+          </div>
+          <div>
+            <strong>{formatMileage(listing.mileage)}</strong>
+            <span>Mileage</span>
+          </div>
+          <div>
+            <strong>{listing.fuelType}</strong>
+            <span>Fuel type</span>
+          </div>
+          <div>
+            <strong>{listing.transmission}</strong>
+            <span>Transmission</span>
+          </div>
+        </div>
+
         <p>{listing.description}</p>
 
         <div className="listing-spec-grid">
@@ -179,7 +207,32 @@ function CarDetailsPage() {
 
       <aside className="listing-summary-card">
         <span className="profile-card-label">Seller summary</span>
-        <h2>{listing.owner?.name || 'Marketplace Member'}</h2>
+        <div className="listing-seller-head">
+          <div className="listing-seller-avatar">
+            {listing.owner?.avatar ? (
+              <img
+                src={listing.owner.avatar}
+                alt={listing.owner?.name || 'Seller avatar'}
+                className="listing-seller-avatar-image"
+              />
+            ) : (
+              <span>
+                {(listing.owner?.name || 'Seller')
+                  .split(' ')
+                  .filter(Boolean)
+                  .slice(0, 2)
+                  .map((part) => part.charAt(0).toUpperCase())
+                  .join('')}
+              </span>
+            )}
+          </div>
+
+          <div className="listing-seller-copy">
+            <h2>{listing.owner?.name || 'Marketplace Member'}</h2>
+            <span>{listing.location}</span>
+          </div>
+        </div>
+
         <p>
           This listing is live in the marketplace and ready for buyers to review
           with a clearer detail layout.
@@ -198,6 +251,18 @@ function CarDetailsPage() {
             <strong>Published</strong>
             <span>{new Date(listing.createdAt).toLocaleDateString()}</span>
           </div>
+        </div>
+
+        <div className="listing-summary-actions">
+          <Link to="/inventory" className="header-secondary-cta">
+            Browse more cars
+          </Link>
+
+          {isOwner ? (
+            <Link to={`/inventory/${listing._id}/edit`} className="header-cta">
+              Edit my listing
+            </Link>
+          ) : null}
         </div>
       </aside>
     </section>
