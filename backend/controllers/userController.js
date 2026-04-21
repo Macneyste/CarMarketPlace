@@ -190,4 +190,69 @@ async function updateUserAvatar(req, res) {
   return res.status(200).json(buildAuthResponse(user));
 }
 
-export { signupUser, signinUser, googleAuthUser, updateUserAvatar };
+async function updateUserProfile(req, res) {
+  const { userId, name, email } = req.body;
+
+  if (!userId) {
+    res.status(400);
+    throw new Error('User ID is required');
+  }
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+
+  if (name === undefined && email === undefined) {
+    res.status(400);
+    throw new Error('Please provide a name or email to update');
+  }
+
+  if (name !== undefined) {
+    const trimmedName = name?.trim();
+
+    if (!trimmedName) {
+      res.status(400);
+      throw new Error('Name cannot be empty');
+    }
+
+    user.name = trimmedName;
+  }
+
+  if (email !== undefined) {
+    const normalizedEmail = normalizeEmail(email);
+
+    if (!normalizedEmail) {
+      res.status(400);
+      throw new Error('Email cannot be empty');
+    }
+
+    if (normalizedEmail !== user.email) {
+      const existingUser = await User.findOne({
+        email: normalizedEmail,
+        _id: { $ne: userId },
+      });
+
+      if (existingUser) {
+        res.status(400);
+        throw new Error('Email is already in use');
+      }
+
+      user.email = normalizedEmail;
+    }
+  }
+
+  await user.save();
+
+  return res.status(200).json(buildAuthResponse(user));
+}
+
+export {
+  signupUser,
+  signinUser,
+  googleAuthUser,
+  updateUserAvatar,
+  updateUserProfile,
+};
