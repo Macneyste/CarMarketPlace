@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import Toast from '../components/Toast';
 
 const initialForm = {
   name: '',
@@ -9,6 +10,11 @@ const initialForm = {
 };
 
 const USER_STORAGE_KEY = 'car-marketplace-user';
+const initialToast = {
+  open: false,
+  tone: 'success',
+  message: '',
+};
 
 const trustPoints = [
   'New deals added every day',
@@ -21,9 +27,8 @@ function SignupPage() {
   const [formData, setFormData] = useState(initialForm);
   const [status, setStatus] = useState({
     loading: false,
-    error: '',
-    success: '',
   });
+  const [toast, setToast] = useState(initialToast);
 
   const formIsComplete =
     formData.name.trim() &&
@@ -34,15 +39,22 @@ function SignupPage() {
   function handleChange(event) {
     const { name, value } = event.target;
 
-    setStatus((current) => ({
-      ...current,
-      error: '',
-    }));
-
     setFormData((current) => ({
       ...current,
       [name]: value,
     }));
+  }
+
+  function showToast(tone, message) {
+    setToast({
+      open: true,
+      tone,
+      message,
+    });
+  }
+
+  function hideToast() {
+    setToast(initialToast);
   }
 
   function validateForm() {
@@ -72,18 +84,16 @@ function SignupPage() {
     if (validationMessage) {
       setStatus({
         loading: false,
-        error: validationMessage,
-        success: '',
       });
+      showToast('error', validationMessage);
 
       return;
     }
 
     setStatus({
       loading: true,
-      error: '',
-      success: '',
     });
+    hideToast();
 
     try {
       const payload = {
@@ -110,9 +120,11 @@ function SignupPage() {
 
       setStatus({
         loading: false,
-        error: '',
-        success: `Welcome, ${data.name}. Your account has been created. Redirecting you now...`,
       });
+      showToast(
+        'success',
+        `Welcome, ${data.name}. Your account has been created. Redirecting you now...`,
+      );
 
       setFormData(initialForm);
 
@@ -122,20 +134,27 @@ function SignupPage() {
     } catch (error) {
       setStatus({
         loading: false,
-        error: error.message || 'Something went wrong',
-        success: '',
       });
+      showToast('error', error.message || 'Something went wrong');
     }
   }
 
   return (
-    <section className="signup-shell">
-      <div className="signup-intro">
-        <span className="eyebrow">Signup</span>
-        <h1>Join the marketplace with a polished, fast account setup.</h1>
-        <p>
-          Create your buyer account to save favorites, compare listings, and
-          move faster when the right car shows up.
+    <>
+      <Toast
+        open={toast.open}
+        tone={toast.tone}
+        message={toast.message}
+        onClose={hideToast}
+      />
+
+      <section className="signup-shell">
+        <div className="signup-intro">
+          <span className="eyebrow">Signup</span>
+          <h1>Join the marketplace with a polished, fast account setup.</h1>
+          <p>
+            Create your buyer account to save favorites, compare listings, and
+            move faster when the right car shows up.
         </p>
 
         <div className="signup-trust-grid">
@@ -172,103 +191,99 @@ function SignupPage() {
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="signup-card">
-        <div className="signup-card-header">
-          <span className="signup-badge">Create account</span>
-          <h2>Start in under a minute</h2>
-          <p>Use your email and a secure password to open your account.</p>
         </div>
 
-        <form className="signup-form" onSubmit={handleSubmit}>
-          <label className="field">
-            <span>Full name</span>
-            <input
-              type="text"
-              name="name"
-              placeholder="Abdirahman Ali"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
-          </label>
-
-          <label className="field">
-            <span>Email address</span>
-            <input
-              type="email"
-              name="email"
-              placeholder="you@example.com"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          </label>
-
-          <label className="field">
-            <span>Password</span>
-            <input
-              type="password"
-              name="password"
-              placeholder="At least 6 characters"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              minLength="6"
-            />
-          </label>
-
-          <label className="field">
-            <span>Confirm password</span>
-            <input
-              type="password"
-              name="confirmPassword"
-              placeholder="Repeat your password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              required
-              minLength="6"
-            />
-          </label>
-
-          <div className="signup-helper-row">
-            <p className="signup-helper-text">
-              {formData.password && formData.confirmPassword
-                ? formData.password === formData.confirmPassword
-                  ? 'Passwords match and are ready to submit.'
-                  : 'Make sure both password fields match.'
-                : 'Use at least 6 characters for your password.'}
-            </p>
+        <div className="signup-card">
+          <div className="signup-card-header">
+            <span className="signup-badge">Create account</span>
+            <h2>Start in under a minute</h2>
+            <p>Use your email and a secure password to open your account.</p>
           </div>
 
-          <button
-            type="submit"
-            className="signup-submit"
-            disabled={status.loading || !formIsComplete}
-          >
-            {status.loading ? 'Creating account...' : 'Create my account'}
-          </button>
+          <form className="signup-form" onSubmit={handleSubmit}>
+            <label className="field">
+              <span>Full name</span>
+              <input
+                type="text"
+                name="name"
+                placeholder="Abdirahman Ali"
+                value={formData.name}
+                onChange={handleChange}
+                required
+              />
+            </label>
 
-          {status.error ? <p className="form-message form-error">{status.error}</p> : null}
-          {status.success ? (
-            <p className="form-message form-success">{status.success}</p>
-          ) : null}
-        </form>
+            <label className="field">
+              <span>Email address</span>
+              <input
+                type="email"
+                name="email"
+                placeholder="you@example.com"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </label>
 
-        <p className="signup-footnote">
-          By continuing, you agree to a simple account setup experience for this
-          starter project.
-        </p>
+            <label className="field">
+              <span>Password</span>
+              <input
+                type="password"
+                name="password"
+                placeholder="At least 6 characters"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                minLength="6"
+              />
+            </label>
 
-        <p className="signup-switch">
-          Want to explore first?{' '}
-          <Link to="/inventory" className="text-link signup-link">
-            Browse the inventory
-          </Link>
-        </p>
-      </div>
-    </section>
+            <label className="field">
+              <span>Confirm password</span>
+              <input
+                type="password"
+                name="confirmPassword"
+                placeholder="Repeat your password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
+                minLength="6"
+              />
+            </label>
+
+            <div className="signup-helper-row">
+              <p className="signup-helper-text">
+                {formData.password && formData.confirmPassword
+                  ? formData.password === formData.confirmPassword
+                    ? 'Passwords match and are ready to submit.'
+                    : 'Make sure both password fields match.'
+                  : 'Use at least 6 characters for your password.'}
+              </p>
+            </div>
+
+            <button
+              type="submit"
+              className="signup-submit"
+              disabled={status.loading || !formIsComplete}
+            >
+              {status.loading ? 'Creating account...' : 'Create my account'}
+            </button>
+          </form>
+
+          <p className="signup-footnote">
+            By continuing, you agree to a simple account setup experience for this
+            starter project.
+          </p>
+
+          <p className="signup-switch">
+            Want to explore first?{' '}
+            <Link to="/inventory" className="text-link signup-link">
+              Browse the inventory
+            </Link>
+          </p>
+        </div>
+      </section>
+    </>
   );
 }
 
