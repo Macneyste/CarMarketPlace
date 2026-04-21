@@ -683,6 +683,10 @@ function ProfilePage() {
                       View listing
                     </Link>
 
+                    <Link to={`/inventory/${listing._id}/edit`} className="text-link">
+                      Edit listing
+                    </Link>
+
                     <button
                       type="button"
                       className="profile-danger-inline"

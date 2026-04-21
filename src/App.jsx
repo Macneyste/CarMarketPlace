@@ -4,6 +4,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AboutPage from './pages/AboutPage';
 import CarDetailsPage from './pages/CarDetailsPage';
 import CreateListingPage from './pages/CreateListingPage';
+import EditListingPage from './pages/EditListingPage';
 import HomePage from './pages/HomePage';
 import InventoryPage from './pages/InventoryPage';
 import NotFoundPage from './pages/NotFoundPage';
@@ -21,6 +22,7 @@ function App() {
         <Route path="inventory/:carId" element={<CarDetailsPage />} />
         <Route path="about" element={<AboutPage />} />
         <Route element={<ProtectedRoute />}>
+          <Route path="inventory/:carId/edit" element={<EditListingPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="sell" element={<CreateListingPage />} />
         </Route>
