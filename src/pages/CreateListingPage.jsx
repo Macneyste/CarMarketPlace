@@ -290,6 +290,7 @@ function CreateListingPage() {
                 placeholder="2021 Toyota Corolla LE in excellent condition"
                 value={formData.title}
                 onChange={handleChange}
+                required
               />
             </label>
 
@@ -302,6 +303,7 @@ function CreateListingPage() {
                   placeholder="Toyota"
                   value={formData.make}
                   onChange={handleChange}
+                  required
                 />
               </label>
 
@@ -313,6 +315,7 @@ function CreateListingPage() {
                   placeholder="Corolla"
                   value={formData.model}
                   onChange={handleChange}
+                  required
                 />
               </label>
 
@@ -324,6 +327,9 @@ function CreateListingPage() {
                   placeholder="2021"
                   value={formData.year}
                   onChange={handleChange}
+                  min="1950"
+                  max={currentYear}
+                  required
                 />
               </label>
 
@@ -335,6 +341,8 @@ function CreateListingPage() {
                   placeholder="18500"
                   value={formData.price}
                   onChange={handleChange}
+                  min="1"
+                  required
                 />
               </label>
 
@@ -346,6 +354,8 @@ function CreateListingPage() {
                   placeholder="42000"
                   value={formData.mileage}
                   onChange={handleChange}
+                  min="0"
+                  required
                 />
               </label>
 
@@ -357,6 +367,7 @@ function CreateListingPage() {
                   placeholder="Mogadishu"
                   value={formData.location}
                   onChange={handleChange}
+                  required
                 />
               </label>
 
@@ -390,6 +401,8 @@ function CreateListingPage() {
                 placeholder="Tell buyers about the condition, service history, and standout features."
                 value={formData.description}
                 onChange={handleChange}
+                minLength="30"
+                required
               />
             </label>
 

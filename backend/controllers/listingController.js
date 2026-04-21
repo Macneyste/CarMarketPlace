@@ -71,6 +71,7 @@ async function createListing(req, res) {
     Number.isNaN(listingData.year) ||
     Number.isNaN(listingData.price) ||
     Number.isNaN(listingData.mileage);
+  const currentYear = new Date().getFullYear() + 1;
 
   if (
     !listingData.owner ||
@@ -85,6 +86,21 @@ async function createListing(req, res) {
   ) {
     res.status(400);
     throw new Error('Please provide all required listing fields');
+  }
+
+  if (listingData.year < 1950 || listingData.year > currentYear) {
+    res.status(400);
+    throw new Error(`Year must be between 1950 and ${currentYear}`);
+  }
+
+  if (listingData.price <= 0) {
+    res.status(400);
+    throw new Error('Price must be greater than 0');
+  }
+
+  if (listingData.mileage < 0) {
+    res.status(400);
+    throw new Error('Mileage must be 0 or higher');
   }
 
   const owner = await User.findById(listingData.owner);
