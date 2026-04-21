@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Toast from '../components/Toast';
 import { useAppContext } from '../context/AppContext';
+import { formatPrice, getListingTitle } from '../utils/listings';
 
 const accountHighlights = [
   {
@@ -90,6 +91,11 @@ function ProfilePage() {
   });
   const [pendingAvatar, setPendingAvatar] = useState('');
   const [pendingFileName, setPendingFileName] = useState('');
+  const [userListings, setUserListings] = useState([]);
+  const [listingStatus, setListingStatus] = useState({
+    loading: true,
+    error: '',
+  });
   const [status, setStatus] = useState({
     uploading: false,
     savingProfile: false,
@@ -129,6 +135,55 @@ function ProfilePage() {
       email: userInfo?.email || '',
     });
   }, [userInfo?.name, userInfo?.email]);
+
+  useEffect(() => {
+    if (!userInfo?._id) {
+      setUserListings([]);
+      setListingStatus({
+        loading: false,
+        error: '',
+      });
+      return;
+    }
+
+    let ignore = false;
+
+    async function loadUserListings() {
+      try {
+        const response = await fetch(`/api/listings/user/${userInfo._id}`);
+        const data = await response.json().catch(() => []);
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Unable to load your listings');
+        }
+
+        if (!ignore) {
+          setUserListings(Array.isArray(data) ? data : []);
+          setListingStatus({
+            loading: false,
+            error: '',
+          });
+        }
+      } catch (error) {
+        if (!ignore) {
+          setListingStatus({
+            loading: false,
+            error: error.message || 'Something went wrong',
+          });
+        }
+      }
+    }
+
+    setListingStatus({
+      loading: true,
+      error: '',
+    });
+    loadUserListings();
+
+    return () => {
+      ignore = true;
+    };
+  }, [userInfo?._id]);
 
   function showToast(tone, message) {
     setToast({
@@ -547,6 +602,48 @@ function ProfilePage() {
             </div>
           </article>
         </div>
+
+        <article className="profile-card profile-panel profile-listing-panel">
+          <div className="profile-panel-header">
+            <span className="profile-card-label">Your listings</span>
+            <h2>Manage the cars you have already published</h2>
+          </div>
+
+          {listingStatus.loading ? (
+            <p className="profile-form-feedback">Loading your listings...</p>
+          ) : listingStatus.error ? (
+            <p className="profile-form-feedback">{listingStatus.error}</p>
+          ) : userListings.length ? (
+            <div className="profile-listing-grid">
+              {userListings.map((listing) => (
+                <article key={listing._id} className="profile-listing-card">
+                  <div className="profile-listing-header">
+                    <strong>{getListingTitle(listing)}</strong>
+                    <span>{formatPrice(listing.price)}</span>
+                  </div>
+
+                  <p>{listing.location}</p>
+
+                  <div className="profile-listing-actions">
+                    <Link to={`/inventory/${listing._id}`} className="text-link">
+                      View listing
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="profile-link-list">
+              <Link to="/sell" className="profile-link-card">
+                <strong>Create your first listing</strong>
+                <span>
+                  You have not published any cars yet. Start with a new seller
+                  listing now.
+                </span>
+              </Link>
+            </div>
+          )}
+        </article>
       </section>
     </>
   );
