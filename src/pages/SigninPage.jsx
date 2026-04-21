@@ -4,10 +4,8 @@ import Toast from '../components/Toast';
 import { USER_STORAGE_KEY } from '../constants/auth';
 
 const initialForm = {
-  name: '',
   email: '',
   password: '',
-  confirmPassword: '',
 };
 
 const initialToast = {
@@ -17,12 +15,12 @@ const initialToast = {
 };
 
 const trustPoints = [
-  'New deals added every day',
-  'Verified seller onboarding flow',
-  'Fast shortlist and inquiry experience',
+  'Access saved favorites instantly',
+  'Pick up where you left off',
+  'Reach the right listings faster',
 ];
 
-function SignupPage() {
+function SigninPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState(initialForm);
   const [status, setStatus] = useState({
@@ -30,11 +28,7 @@ function SignupPage() {
   });
   const [toast, setToast] = useState(initialToast);
 
-  const formIsComplete =
-    formData.name.trim() &&
-    formData.email.trim() &&
-    formData.password &&
-    formData.confirmPassword;
+  const formIsComplete = formData.email.trim() && formData.password;
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -58,19 +52,10 @@ function SignupPage() {
   }
 
   function validateForm() {
-    const trimmedName = formData.name.trim();
     const trimmedEmail = formData.email.trim();
 
-    if (!trimmedName || !trimmedEmail || !formData.password || !formData.confirmPassword) {
-      return 'Please fill in all signup fields';
-    }
-
-    if (formData.password.length < 6) {
-      return 'Password must be at least 6 characters';
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      return 'Passwords do not match';
+    if (!trimmedEmail || !formData.password) {
+      return 'Please enter your email and password';
     }
 
     return '';
@@ -82,27 +67,21 @@ function SignupPage() {
     const validationMessage = validateForm();
 
     if (validationMessage) {
-      setStatus({
-        loading: false,
-      });
+      setStatus({ loading: false });
       showToast('error', validationMessage);
-
       return;
     }
 
-    setStatus({
-      loading: true,
-    });
+    setStatus({ loading: true });
     hideToast();
 
     try {
       const payload = {
-        name: formData.name.trim(),
         email: formData.email.trim(),
         password: formData.password,
       };
 
-      const response = await fetch('/api/users/signup', {
+      const response = await fetch('/api/users/signin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -113,28 +92,22 @@ function SignupPage() {
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(data.message || 'Unable to create account');
+        throw new Error(data.message || 'Unable to sign in');
       }
 
       localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(data));
-
-      setStatus({
-        loading: false,
-      });
+      setStatus({ loading: false });
       showToast(
         'success',
-        `Welcome, ${data.name}. Your account has been created. Redirecting you now...`,
+        `Welcome back, ${data.name}. Signing you in now...`,
       );
-
       setFormData(initialForm);
 
       window.setTimeout(() => {
         navigate('/inventory');
       }, 1400);
     } catch (error) {
-      setStatus({
-        loading: false,
-      });
+      setStatus({ loading: false });
       showToast('error', error.message || 'Something went wrong');
     }
   }
@@ -150,11 +123,11 @@ function SignupPage() {
 
       <section className="signup-shell">
         <div className="signup-intro">
-          <span className="eyebrow">Signup</span>
-          <h1>Join the marketplace with a polished, fast account setup.</h1>
+          <span className="eyebrow">Signin</span>
+          <h1>Welcome back to your car search shortlist.</h1>
           <p>
-            Create your buyer account to save favorites, compare listings, and
-            move faster when the right car shows up.
+            Sign in to continue browsing, revisit saved listings, and get back to
+            the marketplace without starting over.
           </p>
 
           <div className="signup-trust-grid">
@@ -168,26 +141,26 @@ function SignupPage() {
 
           <div className="signup-showcase">
             <div className="signup-showcase-copy">
-              <span className="signup-showcase-label">Member Preview</span>
-              <h2>Shortlist smarter</h2>
+              <span className="signup-showcase-label">Member Access</span>
+              <h2>Jump back in fast</h2>
               <p>
-                Keep your favorite vehicles in one place and return to them
-                whenever you are ready to compare.
+                Your account keeps the experience focused, so you can continue
+                from the listings that already caught your attention.
               </p>
             </div>
 
             <div className="signup-showcase-metrics">
               <div>
-                <strong>24/7</strong>
-                <span>Saved access</span>
+                <strong>1 Login</strong>
+                <span>Access your account instantly</span>
               </div>
               <div>
-                <strong>Fresh</strong>
-                <span>Daily listing updates</span>
+                <strong>Saved</strong>
+                <span>Keep favorites in one place</span>
               </div>
               <div>
-                <strong>Quick</strong>
-                <span>Cleaner inquiry flow</span>
+                <strong>Ready</strong>
+                <span>Continue browsing smoothly</span>
               </div>
             </div>
           </div>
@@ -195,24 +168,12 @@ function SignupPage() {
 
         <div className="signup-card">
           <div className="signup-card-header">
-            <span className="signup-badge">Create account</span>
-            <h2>Start in under a minute</h2>
-            <p>Use your email and a secure password to open your account.</p>
+            <span className="signup-badge">Sign in</span>
+            <h2>Access your account</h2>
+            <p>Use the email and password you created during signup.</p>
           </div>
 
           <form className="signup-form" onSubmit={handleSubmit}>
-            <label className="field">
-              <span>Full name</span>
-              <input
-                type="text"
-                name="name"
-                placeholder="Abdirahman Ali"
-                value={formData.name}
-                onChange={handleChange}
-                required
-              />
-            </label>
-
             <label className="field">
               <span>Email address</span>
               <input
@@ -230,21 +191,8 @@ function SignupPage() {
               <input
                 type="password"
                 name="password"
-                placeholder="At least 6 characters"
+                placeholder="Enter your password"
                 value={formData.password}
-                onChange={handleChange}
-                required
-                minLength="6"
-              />
-            </label>
-
-            <label className="field">
-              <span>Confirm password</span>
-              <input
-                type="password"
-                name="confirmPassword"
-                placeholder="Repeat your password"
-                value={formData.confirmPassword}
                 onChange={handleChange}
                 required
                 minLength="6"
@@ -253,11 +201,8 @@ function SignupPage() {
 
             <div className="signup-helper-row">
               <p className="signup-helper-text">
-                {formData.password && formData.confirmPassword
-                  ? formData.password === formData.confirmPassword
-                    ? 'Passwords match and are ready to submit.'
-                    : 'Make sure both password fields match.'
-                  : 'Use at least 6 characters for your password.'}
+                Sign in with the same credentials you used when creating your
+                marketplace account.
               </p>
             </div>
 
@@ -266,26 +211,19 @@ function SignupPage() {
               className="signup-submit"
               disabled={status.loading || !formIsComplete}
             >
-              {status.loading ? 'Creating account...' : 'Create my account'}
+              {status.loading ? 'Signing you in...' : 'Sign in to my account'}
             </button>
           </form>
 
           <p className="signup-footnote">
-            By continuing, you agree to a simple account setup experience for this
-            starter project.
+            This starter signs you in against the backend route you already
+            connected to MongoDB.
           </p>
 
           <p className="signup-switch">
-            Already have an account?{' '}
-            <Link to="/signin" className="text-link signup-link">
-              Sign in here
-            </Link>
-          </p>
-
-          <p className="signup-switch">
-            Want to explore first?{' '}
-            <Link to="/inventory" className="text-link signup-link">
-              Browse the inventory
+            Need a new account?{' '}
+            <Link to="/signup" className="text-link signup-link">
+              Create one here
             </Link>
           </p>
         </div>
@@ -294,4 +232,4 @@ function SignupPage() {
   );
 }
 
-export default SignupPage;
+export default SigninPage;

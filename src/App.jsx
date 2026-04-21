@@ -5,6 +5,7 @@ import CarDetailsPage from './pages/CarDetailsPage';
 import HomePage from './pages/HomePage';
 import InventoryPage from './pages/InventoryPage';
 import NotFoundPage from './pages/NotFoundPage';
+import SigninPage from './pages/SigninPage';
 import SignupPage from './pages/SignupPage';
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <Route path="inventory" element={<InventoryPage />} />
         <Route path="inventory/:carId" element={<CarDetailsPage />} />
         <Route path="about" element={<AboutPage />} />
+        <Route path="signin" element={<SigninPage />} />
         <Route path="signup" element={<SignupPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
