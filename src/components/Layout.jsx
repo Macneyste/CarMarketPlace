@@ -9,6 +9,9 @@ const primaryLinks = [
 
 function Layout() {
   const { isAuthenticated, signout, userInfo } = useAppContext();
+  const navigationLinks = isAuthenticated
+    ? [...primaryLinks, { to: '/profile', label: 'Profile' }]
+    : primaryLinks;
   const sessionLabel = isAuthenticated
     ? `Welcome back, ${userInfo?.name?.split(' ')[0] || 'Driver'}`
     : 'Guest session';
@@ -43,7 +46,7 @@ function Layout() {
 
               <div className="header-nav-group">
                 <nav className="main-nav" aria-label="Primary navigation">
-                  {primaryLinks.map((link) => (
+                  {navigationLinks.map((link) => (
                     <NavLink
                       key={link.to}
                       to={link.to}

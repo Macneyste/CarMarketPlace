@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import OAuthButton from '../components/OAuthButton';
 import Toast from '../components/Toast';
 import { useAppContext } from '../context/AppContext';
@@ -22,6 +22,7 @@ const trustPoints = [
 ];
 
 function SigninPage() {
+  const location = useLocation();
   const navigate = useNavigate();
   const { saveUser } = useAppContext();
   const [formData, setFormData] = useState(initialForm);
@@ -31,6 +32,7 @@ function SigninPage() {
   const [toast, setToast] = useState(initialToast);
 
   const formIsComplete = formData.email.trim() && formData.password;
+  const redirectPath = location.state?.from?.pathname || '/inventory';
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -90,7 +92,7 @@ function SigninPage() {
       );
 
       window.setTimeout(() => {
-        navigate('/inventory');
+        navigate(redirectPath);
       }, 1400);
     } catch (error) {
       setStatus({ loading: false });
@@ -141,7 +143,7 @@ function SigninPage() {
       setFormData(initialForm);
 
       window.setTimeout(() => {
-        navigate('/inventory');
+        navigate(redirectPath);
       }, 1400);
     } catch (error) {
       setStatus({ loading: false });
