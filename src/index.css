@@ -946,14 +946,6 @@ a {
   font-size: 0.96rem;
 }
 
-.profile-form-feedback-success {
-  color: #166534;
-}
-
-.profile-form-feedback-error {
-  color: #b91c1c;
-}
-
 .profile-upload-panel {
   display: grid;
   gap: 1rem;

@@ -93,8 +93,6 @@ function ProfilePage() {
   const [status, setStatus] = useState({
     uploading: false,
     savingProfile: false,
-    updateMessage: '',
-    updateTone: 'success',
   });
   const [toast, setToast] = useState(initialToast);
   const displayName = userInfo?.name || 'Marketplace Member';
@@ -149,11 +147,6 @@ function ProfilePage() {
     setProfileForm((current) => ({
       ...current,
       [name]: value,
-    }));
-
-    setStatus((current) => ({
-      ...current,
-      updateMessage: '',
     }));
   }
 
@@ -246,28 +239,20 @@ function ProfilePage() {
     event.preventDefault();
 
     if (!trimmedName || !trimmedEmail) {
-      setStatus((current) => ({
-        ...current,
-        updateMessage: 'Please enter both your name and email address.',
-        updateTone: 'error',
-      }));
+      showToast('error', 'Please enter both your name and email address.');
       return;
     }
 
     if (!profileHasChanges) {
-      setStatus((current) => ({
-        ...current,
-        updateMessage: 'There are no new changes to save yet.',
-        updateTone: 'success',
-      }));
+      showToast('success', 'Your profile is already up to date.');
       return;
     }
 
     setStatus((current) => ({
       ...current,
       savingProfile: true,
-      updateMessage: '',
     }));
+    hideToast();
 
     try {
       const response = await fetch('/api/users/profile', {
@@ -292,16 +277,14 @@ function ProfilePage() {
       setStatus((current) => ({
         ...current,
         savingProfile: false,
-        updateMessage: 'Profile details saved successfully.',
-        updateTone: 'success',
       }));
+      showToast('success', 'Profile details saved successfully.');
     } catch (error) {
       setStatus((current) => ({
         ...current,
         savingProfile: false,
-        updateMessage: error.message || 'Something went wrong',
-        updateTone: 'error',
       }));
+      showToast('error', error.message || 'Something went wrong');
     }
   }
 
@@ -383,15 +366,9 @@ function ProfilePage() {
                   {status.savingProfile ? 'Saving changes...' : 'Save profile changes'}
                 </button>
 
-                {status.updateMessage ? (
-                  <p className={`profile-form-feedback profile-form-feedback-${status.updateTone}`}>
-                    {status.updateMessage}
-                  </p>
-                ) : (
-                  <p className="profile-form-feedback">
-                    Update your account details and keep the marketplace info current.
-                  </p>
-                )}
+                <p className="profile-form-feedback">
+                  Update your account details and keep the marketplace info current.
+                </p>
               </div>
             </form>
 

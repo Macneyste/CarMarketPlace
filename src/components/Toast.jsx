@@ -19,12 +19,12 @@ function Toast({ open, tone = 'success', message, onClose }) {
     return null;
   }
 
+  const toastLabel = tone === 'error' ? 'Error' : 'Success';
+
   return (
     <div className={`toast toast-${tone}`} role="status" aria-live="polite">
       <div className="toast-copy">
-        <span className="toast-label">
-          {tone === 'success' ? 'Success' : 'Notice'}
-        </span>
+        <span className="toast-label">{toastLabel}</span>
         <p>{message}</p>
       </div>
 
