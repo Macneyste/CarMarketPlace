@@ -63,6 +63,23 @@ function Layout() {
       </header>
 
       <main className="container page-content">
+        <section className="session-banner">
+          <div className="session-banner-copy">
+            <span className="session-banner-label">Session status</span>
+            <strong>
+              {isAuthenticated
+                ? `Logged in as ${userInfo?.name}`
+                : 'Browsing as guest'}
+            </strong>
+          </div>
+
+          <p className="session-banner-text">
+            {isAuthenticated
+              ? userInfo?.email
+              : 'Create an account or sign in to keep your user state in local storage.'}
+          </p>
+        </section>
+
         <Outlet />
       </main>
     </div>
