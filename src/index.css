@@ -875,6 +875,85 @@ a {
   margin-top: 1.75rem;
 }
 
+.profile-form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.75rem;
+  padding: 1.1rem;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.profile-form-header {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.profile-form-header h2 {
+  margin: 0;
+  font-size: clamp(1.45rem, 3vw, 1.95rem);
+  letter-spacing: -0.03em;
+}
+
+.profile-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.profile-field {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.profile-field span {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.profile-field input {
+  width: 100%;
+  min-height: 54px;
+  padding: 0 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #0f172a;
+  font: inherit;
+  outline: none;
+}
+
+.profile-field input::placeholder {
+  color: #94a3b8;
+}
+
+.profile-field input:focus {
+  border-color: rgba(249, 115, 22, 0.72);
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.12);
+}
+
+.profile-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.profile-form-feedback {
+  margin: 0;
+  color: #475569;
+  font-size: 0.96rem;
+}
+
+.profile-form-feedback-success {
+  color: #166534;
+}
+
+.profile-form-feedback-error {
+  color: #b91c1c;
+}
+
 .profile-upload-panel {
   display: grid;
   gap: 1rem;
@@ -1087,7 +1166,8 @@ a {
 
   .signup-trust-grid,
   .signup-showcase-metrics,
-  .profile-facts-grid {
+  .profile-facts-grid,
+  .profile-form-grid {
     grid-template-columns: 1fr;
   }
 

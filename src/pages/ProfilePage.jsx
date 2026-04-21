@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Toast from '../components/Toast';
 import { useAppContext } from '../context/AppContext';
@@ -84,16 +84,27 @@ function ProfilePage() {
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
   const { signout, saveUser, userInfo } = useAppContext();
+  const [profileForm, setProfileForm] = useState({
+    name: userInfo?.name || '',
+    email: userInfo?.email || '',
+  });
   const [pendingAvatar, setPendingAvatar] = useState('');
   const [pendingFileName, setPendingFileName] = useState('');
   const [status, setStatus] = useState({
     uploading: false,
+    savingProfile: false,
+    updateMessage: '',
+    updateTone: 'success',
   });
   const [toast, setToast] = useState(initialToast);
   const displayName = userInfo?.name || 'Marketplace Member';
   const firstName = displayName.trim().split(' ').filter(Boolean)[0] || 'Driver';
   const providerLabel = formatProvider(userInfo?.authProvider);
   const currentAvatar = pendingAvatar || userInfo?.avatar || '';
+  const trimmedName = profileForm.name.trim();
+  const trimmedEmail = profileForm.email.trim();
+  const profileHasChanges =
+    trimmedName !== (userInfo?.name || '') || trimmedEmail !== (userInfo?.email || '');
   const profileFacts = [
     {
       label: 'Full name',
@@ -113,6 +124,13 @@ function ProfilePage() {
     },
   ];
 
+  useEffect(() => {
+    setProfileForm({
+      name: userInfo?.name || '',
+      email: userInfo?.email || '',
+    });
+  }, [userInfo?.name, userInfo?.email]);
+
   function showToast(tone, message) {
     setToast({
       open: true,
@@ -123,6 +141,20 @@ function ProfilePage() {
 
   function hideToast() {
     setToast(initialToast);
+  }
+
+  function handleProfileFieldChange(event) {
+    const { name, value } = event.target;
+
+    setProfileForm((current) => ({
+      ...current,
+      [name]: value,
+    }));
+
+    setStatus((current) => ({
+      ...current,
+      updateMessage: '',
+    }));
   }
 
   function handleSignout() {
@@ -210,6 +242,69 @@ function ProfilePage() {
     }
   }
 
+  async function handleProfileSubmit(event) {
+    event.preventDefault();
+
+    if (!trimmedName || !trimmedEmail) {
+      setStatus((current) => ({
+        ...current,
+        updateMessage: 'Please enter both your name and email address.',
+        updateTone: 'error',
+      }));
+      return;
+    }
+
+    if (!profileHasChanges) {
+      setStatus((current) => ({
+        ...current,
+        updateMessage: 'There are no new changes to save yet.',
+        updateTone: 'success',
+      }));
+      return;
+    }
+
+    setStatus((current) => ({
+      ...current,
+      savingProfile: true,
+      updateMessage: '',
+    }));
+
+    try {
+      const response = await fetch('/api/users/profile', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: userInfo?._id,
+          name: trimmedName,
+          email: trimmedEmail,
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Unable to update your profile');
+      }
+
+      saveUser(data);
+      setStatus((current) => ({
+        ...current,
+        savingProfile: false,
+        updateMessage: 'Profile details saved successfully.',
+        updateTone: 'success',
+      }));
+    } catch (error) {
+      setStatus((current) => ({
+        ...current,
+        savingProfile: false,
+        updateMessage: error.message || 'Something went wrong',
+        updateTone: 'error',
+      }));
+    }
+  }
+
   return (
     <>
       <Toast
@@ -248,6 +343,57 @@ function ProfilePage() {
                 </p>
               </div>
             </div>
+
+            <form className="profile-form" onSubmit={handleProfileSubmit}>
+              <div className="profile-form-header">
+                <span className="profile-card-label">Account details</span>
+                <h2>Edit your name and email</h2>
+              </div>
+
+              <div className="profile-form-grid">
+                <label className="profile-field">
+                  <span>Full name</span>
+                  <input
+                    type="text"
+                    name="name"
+                    value={profileForm.name}
+                    onChange={handleProfileFieldChange}
+                    placeholder="Your full name"
+                  />
+                </label>
+
+                <label className="profile-field">
+                  <span>Email address</span>
+                  <input
+                    type="email"
+                    name="email"
+                    value={profileForm.email}
+                    onChange={handleProfileFieldChange}
+                    placeholder="you@example.com"
+                  />
+                </label>
+              </div>
+
+              <div className="profile-form-actions">
+                <button
+                  type="submit"
+                  className="profile-primary-action"
+                  disabled={status.savingProfile}
+                >
+                  {status.savingProfile ? 'Saving changes...' : 'Save profile changes'}
+                </button>
+
+                {status.updateMessage ? (
+                  <p className={`profile-form-feedback profile-form-feedback-${status.updateTone}`}>
+                    {status.updateMessage}
+                  </p>
+                ) : (
+                  <p className="profile-form-feedback">
+                    Update your account details and keep the marketplace info current.
+                  </p>
+                )}
+              </div>
+            </form>
 
             <div className="profile-upload-panel">
               <div className="profile-upload-copy">
