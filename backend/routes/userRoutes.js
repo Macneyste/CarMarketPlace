@@ -3,6 +3,7 @@ import {
   googleAuthUser,
   signinUser,
   signupUser,
+  updateUserAvatar,
 } from '../controllers/userController.js';
 
 const router = express.Router();
@@ -16,5 +17,6 @@ router.get('/', (_req, res) => {
 router.post('/signup', signupUser);
 router.post('/signin', signinUser);
 router.post('/google', googleAuthUser);
+router.patch('/profile-image', updateUserAvatar);
 
 export default router;

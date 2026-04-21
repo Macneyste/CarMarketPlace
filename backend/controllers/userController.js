@@ -3,6 +3,7 @@ import { OAuth2Client } from 'google-auth-library';
 import User from '../models/userModel.js';
 
 const googleClient = new OAuth2Client();
+const avatarPattern = /^data:image\/(png|jpeg|webp);base64,/i;
 
 function normalizeEmail(email = '') {
   return email.trim().toLowerCase();
@@ -16,6 +17,26 @@ function buildAuthResponse(user) {
     avatar: user.avatar || '',
     authProvider: user.authProvider,
   };
+}
+
+function validateAvatarData(avatar = '') {
+  if (!avatar) {
+    return 'Profile image is required';
+  }
+
+  if (typeof avatar !== 'string') {
+    return 'Profile image must be sent as a string';
+  }
+
+  if (!avatarPattern.test(avatar.trim())) {
+    return 'Please upload a PNG, JPG, or WEBP image';
+  }
+
+  if (avatar.length > 2_500_000) {
+    return 'Profile image is too large. Please choose a smaller file';
+  }
+
+  return '';
 }
 
 async function signupUser(req, res) {
@@ -141,4 +162,32 @@ async function googleAuthUser(req, res) {
   return res.status(200).json(buildAuthResponse(user));
 }
 
-export { signupUser, signinUser, googleAuthUser };
+async function updateUserAvatar(req, res) {
+  const { userId, avatar } = req.body;
+
+  if (!userId) {
+    res.status(400);
+    throw new Error('User ID is required');
+  }
+
+  const avatarValidationMessage = validateAvatarData(avatar);
+
+  if (avatarValidationMessage) {
+    res.status(400);
+    throw new Error(avatarValidationMessage);
+  }
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+
+  user.avatar = avatar.trim();
+  await user.save();
+
+  return res.status(200).json(buildAuthResponse(user));
+}
+
+export { signupUser, signinUser, googleAuthUser, updateUserAvatar };
