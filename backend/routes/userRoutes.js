@@ -1,5 +1,5 @@
 import express from 'express';
-import { signupUser } from '../controllers/userController.js';
+import { signinUser, signupUser } from '../controllers/userController.js';
 
 const router = express.Router();
 
@@ -10,5 +10,6 @@ router.get('/', (_req, res) => {
 });
 
 router.post('/signup', signupUser);
+router.post('/signin', signinUser);
 
 export default router;
