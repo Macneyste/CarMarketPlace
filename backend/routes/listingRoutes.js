@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   createListing,
+  deleteListing,
   getListingById,
   getListings,
   getUserListings,
@@ -12,5 +13,6 @@ router.get('/', getListings);
 router.get('/user/:userId', getUserListings);
 router.get('/:listingId', getListingById);
 router.post('/', createListing);
+router.delete('/:listingId', deleteListing);
 
 export default router;

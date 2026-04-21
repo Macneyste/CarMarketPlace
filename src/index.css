@@ -1585,6 +1585,20 @@ a {
   font-weight: 800;
 }
 
+.profile-danger-inline {
+  border: 0;
+  background: transparent;
+  color: #b91c1c;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.profile-danger-inline:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
 .profile-link-card {
   display: grid;
   gap: 0.35rem;

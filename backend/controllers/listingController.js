@@ -134,4 +134,32 @@ async function createListing(req, res) {
   return res.status(201).json(populatedListing);
 }
 
-export { getListings, getUserListings, getListingById, createListing };
+async function deleteListing(req, res) {
+  const { listingId } = req.params;
+  const { userId } = req.body;
+
+  if (!listingId || !userId) {
+    res.status(400);
+    throw new Error('Listing ID and user ID are required');
+  }
+
+  const listing = await Listing.findById(listingId);
+
+  if (!listing) {
+    res.status(404);
+    throw new Error('Listing not found');
+  }
+
+  if (String(listing.owner) !== userId) {
+    res.status(403);
+    throw new Error('You can only delete your own listing');
+  }
+
+  await Listing.findByIdAndDelete(listingId);
+
+  return res.status(200).json({
+    message: 'Listing deleted successfully',
+  });
+}
+
+export { getListings, getUserListings, getListingById, createListing, deleteListing };

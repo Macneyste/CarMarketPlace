@@ -95,6 +95,7 @@ function ProfilePage() {
   const [listingStatus, setListingStatus] = useState({
     loading: true,
     error: '',
+    deletingId: '',
   });
   const [status, setStatus] = useState({
     uploading: false,
@@ -162,6 +163,7 @@ function ProfilePage() {
           setListingStatus({
             loading: false,
             error: '',
+            deletingId: '',
           });
         }
       } catch (error) {
@@ -169,6 +171,7 @@ function ProfilePage() {
           setListingStatus({
             loading: false,
             error: error.message || 'Something went wrong',
+            deletingId: '',
           });
         }
       }
@@ -177,6 +180,7 @@ function ProfilePage() {
     setListingStatus({
       loading: true,
       error: '',
+      deletingId: '',
     });
     loadUserListings();
 
@@ -378,6 +382,56 @@ function ProfilePage() {
       setStatus((current) => ({
         ...current,
         savingProfile: false,
+      }));
+      showToast('error', error.message || 'Something went wrong');
+    }
+  }
+
+  async function handleDeleteListing(listingId) {
+    if (!userInfo?._id || !listingId || listingStatus.deletingId) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      'Delete this listing permanently? This cannot be undone.',
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setListingStatus((current) => ({
+      ...current,
+      deletingId: listingId,
+    }));
+
+    try {
+      const response = await fetch(`/api/listings/${listingId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: userInfo._id,
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Unable to delete this listing');
+      }
+
+      setUserListings((current) => current.filter((listing) => listing._id !== listingId));
+      setListingStatus((current) => ({
+        ...current,
+        deletingId: '',
+      }));
+      showToast('success', 'Listing deleted successfully.');
+    } catch (error) {
+      setListingStatus((current) => ({
+        ...current,
+        deletingId: '',
       }));
       showToast('error', error.message || 'Something went wrong');
     }
@@ -628,6 +682,17 @@ function ProfilePage() {
                     <Link to={`/inventory/${listing._id}`} className="text-link">
                       View listing
                     </Link>
+
+                    <button
+                      type="button"
+                      className="profile-danger-inline"
+                      onClick={() => handleDeleteListing(listing._id)}
+                      disabled={listingStatus.deletingId === listing._id}
+                    >
+                      {listingStatus.deletingId === listing._id
+                        ? 'Deleting...'
+                        : 'Delete'}
+                    </button>
                   </div>
                 </article>
               ))}
