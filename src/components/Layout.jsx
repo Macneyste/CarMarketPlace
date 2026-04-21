@@ -10,25 +10,37 @@ function Layout() {
   return (
     <div className="app-shell">
       <header className="site-header">
-        <div className="container header-content">
-          <NavLink to="/" className="brand">
-            Car Marketplace
-          </NavLink>
-
-          <nav className="main-nav" aria-label="Primary navigation">
-            {navLinks.map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                end={link.end}
-                className={({ isActive }) =>
-                  isActive ? 'nav-link nav-link-active' : 'nav-link'
-                }
-              >
-                {link.label}
+        <div className="container">
+          <div className="header-panel">
+            <div className="header-content">
+              <NavLink to="/" className="brand" aria-label="Car Marketplace home">
+                <span className="brand-mark">CM</span>
+                <span className="brand-copy">
+                  <span className="brand-title">Car Marketplace</span>
+                  <span className="brand-subtitle">Premium car listing starter</span>
+                </span>
               </NavLink>
-            ))}
-          </nav>
+
+              <nav className="main-nav" aria-label="Primary navigation">
+                {navLinks.map((link) => (
+                  <NavLink
+                    key={link.to}
+                    to={link.to}
+                    end={link.end}
+                    className={({ isActive }) =>
+                      isActive ? 'nav-link nav-link-active' : 'nav-link'
+                    }
+                  >
+                    {link.label}
+                  </NavLink>
+                ))}
+              </nav>
+
+              <NavLink to="/inventory" className="header-cta">
+                Browse Cars
+              </NavLink>
+            </div>
+          </div>
         </div>
       </header>
 
