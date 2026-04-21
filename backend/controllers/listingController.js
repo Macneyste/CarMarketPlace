@@ -42,6 +42,22 @@ function buildListingPayload(body = {}) {
   };
 }
 
+function validateNumericListingFields(listing, currentYear) {
+  if (listing.year < 1950 || listing.year > currentYear) {
+    return `Year must be between 1950 and ${currentYear}`;
+  }
+
+  if (listing.price <= 0) {
+    return 'Price must be greater than 0';
+  }
+
+  if (listing.mileage < 0) {
+    return 'Mileage must be 0 or higher';
+  }
+
+  return '';
+}
+
 async function getListings(_req, res) {
   const listings = await Listing.find()
     .populate('owner', 'name email avatar')
@@ -103,19 +119,14 @@ async function createListing(req, res) {
     throw new Error('Please provide all required listing fields');
   }
 
-  if (listingData.year < 1950 || listingData.year > currentYear) {
-    res.status(400);
-    throw new Error(`Year must be between 1950 and ${currentYear}`);
-  }
+  const numericValidationMessage = validateNumericListingFields(
+    listingData,
+    currentYear,
+  );
 
-  if (listingData.price <= 0) {
+  if (numericValidationMessage) {
     res.status(400);
-    throw new Error('Price must be greater than 0');
-  }
-
-  if (listingData.mileage < 0) {
-    res.status(400);
-    throw new Error('Mileage must be 0 or higher');
+    throw new Error(numericValidationMessage);
   }
 
   const owner = await User.findById(listingData.owner);
@@ -162,4 +173,101 @@ async function deleteListing(req, res) {
   });
 }
 
-export { getListings, getUserListings, getListingById, createListing, deleteListing };
+async function updateListing(req, res) {
+  const { listingId } = req.params;
+  const { userId } = req.body;
+
+  if (!listingId || !userId) {
+    res.status(400);
+    throw new Error('Listing ID and user ID are required');
+  }
+
+  const listing = await Listing.findById(listingId);
+
+  if (!listing) {
+    res.status(404);
+    throw new Error('Listing not found');
+  }
+
+  if (String(listing.owner) !== userId) {
+    res.status(403);
+    throw new Error('You can only update your own listing');
+  }
+
+  const currentYear = new Date().getFullYear() + 1;
+  const updates = req.body;
+
+  if (updates.title !== undefined) {
+    listing.title = updates.title.trim();
+  }
+
+  if (updates.make !== undefined) {
+    listing.make = updates.make.trim();
+  }
+
+  if (updates.model !== undefined) {
+    listing.model = updates.model.trim();
+  }
+
+  if (updates.year !== undefined) {
+    listing.year = Number(updates.year);
+  }
+
+  if (updates.price !== undefined) {
+    listing.price = Number(updates.price);
+  }
+
+  if (updates.mileage !== undefined) {
+    listing.mileage = Number(updates.mileage);
+  }
+
+  if (updates.fuelType !== undefined) {
+    listing.fuelType = updates.fuelType.trim();
+  }
+
+  if (updates.transmission !== undefined) {
+    listing.transmission = updates.transmission.trim();
+  }
+
+  if (updates.location !== undefined) {
+    listing.location = updates.location.trim();
+  }
+
+  if (updates.description !== undefined) {
+    listing.description = updates.description.trim();
+  }
+
+  if (updates.images !== undefined) {
+    listing.images = normalizeListingImages(updates.images);
+  }
+
+  const numericValidationMessage = validateNumericListingFields(listing, currentYear);
+
+  if (
+    Number.isNaN(listing.year) ||
+    Number.isNaN(listing.price) ||
+    Number.isNaN(listing.mileage) ||
+    numericValidationMessage
+  ) {
+    res.status(400);
+    throw new Error(numericValidationMessage || 'Listing numeric fields are invalid');
+  }
+
+  await listing.save();
+
+  const populatedListing = await Listing.findById(listing._id).populate(
+    'owner',
+    'name email avatar',
+  );
+
+  return res.status(200).json(populatedListing);
+}
+
+export {
+  getListings,
+  getUserListings,
+  getListingById,
+  createListing,
+  deleteListing,
+  updateListing,
+};
