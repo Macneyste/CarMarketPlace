@@ -152,6 +152,48 @@ a {
   transform: translateY(-1px);
 }
 
+.header-user-panel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header-user-copy {
+  display: grid;
+  gap: 0.1rem;
+  text-align: right;
+  color: #f8fafc;
+}
+
+.header-user-copy strong {
+  font-size: 0.96rem;
+  letter-spacing: -0.02em;
+}
+
+.header-user-label {
+  color: rgba(226, 232, 240, 0.68);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.header-signout {
+  min-height: 42px;
+  padding: 0 0.95rem;
+  border: 1px solid rgba(248, 250, 252, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #f8fafc;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.header-signout:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
 .page-content {
   padding: 3.5rem 0 4rem;
 }
@@ -624,6 +666,11 @@ a {
 
   .header-cta {
     width: 100%;
+  }
+
+  .header-user-panel {
+    width: 100%;
+    justify-content: space-between;
   }
 
   .signup-trust-grid,

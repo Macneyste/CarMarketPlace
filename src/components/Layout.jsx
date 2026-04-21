@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
+import { useAppContext } from '../context/AppContext';
 
 const navLinks = [
   { to: '/', label: 'Home', end: true },
@@ -9,6 +10,8 @@ const navLinks = [
 ];
 
 function Layout() {
+  const { isAuthenticated, signout, userInfo } = useAppContext();
+
   return (
     <div className="app-shell">
       <header className="site-header">
@@ -38,9 +41,22 @@ function Layout() {
                 ))}
               </nav>
 
-              <NavLink to="/signup" className="header-cta">
-                Create Account
-              </NavLink>
+              {isAuthenticated ? (
+                <div className="header-user-panel">
+                  <div className="header-user-copy">
+                    <span className="header-user-label">Signed in</span>
+                    <strong>{userInfo?.name}</strong>
+                  </div>
+
+                  <button type="button" className="header-signout" onClick={signout}>
+                    Sign out
+                  </button>
+                </div>
+              ) : (
+                <NavLink to="/signup" className="header-cta">
+                  Create Account
+                </NavLink>
+              )}
             </div>
           </div>
         </div>

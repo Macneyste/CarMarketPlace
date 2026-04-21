@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Toast from '../components/Toast';
-import { USER_STORAGE_KEY } from '../constants/auth';
+import { useAppContext } from '../context/AppContext';
 
 const initialForm = {
   name: '',
@@ -24,6 +24,7 @@ const trustPoints = [
 
 function SignupPage() {
   const navigate = useNavigate();
+  const { saveUser } = useAppContext();
   const [formData, setFormData] = useState(initialForm);
   const [status, setStatus] = useState({
     loading: false,
@@ -116,7 +117,7 @@ function SignupPage() {
         throw new Error(data.message || 'Unable to create account');
       }
 
-      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(data));
+      saveUser(data);
 
       setStatus({
         loading: false,
