@@ -50,6 +50,21 @@ async function getListings(_req, res) {
   return res.status(200).json(listings);
 }
 
+async function getUserListings(req, res) {
+  const { userId } = req.params;
+
+  if (!userId) {
+    res.status(400);
+    throw new Error('User ID is required');
+  }
+
+  const listings = await Listing.find({ owner: userId })
+    .populate('owner', 'name email avatar')
+    .sort({ createdAt: -1 });
+
+  return res.status(200).json(listings);
+}
+
 async function getListingById(req, res) {
   const { listingId } = req.params;
   const listing = await Listing.findById(listingId).populate(
@@ -119,4 +134,4 @@ async function createListing(req, res) {
   return res.status(201).json(populatedListing);
 }
 
-export { getListings, getListingById, createListing };
+export { getListings, getUserListings, getListingById, createListing };
