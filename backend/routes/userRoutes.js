@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+  deleteUserProfile,
   googleAuthUser,
   signinUser,
   signupUser,
@@ -20,5 +21,6 @@ router.post('/signin', signinUser);
 router.post('/google', googleAuthUser);
 router.patch('/profile', updateUserProfile);
 router.patch('/profile-image', updateUserAvatar);
+router.delete('/profile/:userId', deleteUserProfile);
 
 export default router;

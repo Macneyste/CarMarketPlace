@@ -1015,7 +1015,8 @@ a {
 }
 
 .profile-primary-action,
-.profile-secondary-action {
+.profile-secondary-action,
+.profile-danger-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1028,7 +1029,8 @@ a {
 }
 
 .profile-primary-action:disabled,
-.profile-secondary-action:disabled {
+.profile-secondary-action:disabled,
+.profile-danger-action:disabled {
   cursor: not-allowed;
   opacity: 0.68;
   box-shadow: none;
@@ -1046,8 +1048,15 @@ a {
   color: #0f172a;
 }
 
+.profile-danger-action {
+  border: 1px solid rgba(220, 38, 38, 0.14);
+  background: rgba(254, 242, 242, 0.96);
+  color: #b91c1c;
+}
+
 .profile-primary-action:hover,
 .profile-secondary-action:hover,
+.profile-danger-action:hover,
 .profile-link-card:hover {
   transform: translateY(-1px);
 }

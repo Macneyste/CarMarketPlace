@@ -93,6 +93,7 @@ function ProfilePage() {
   const [status, setStatus] = useState({
     uploading: false,
     savingProfile: false,
+    deletingAccount: false,
   });
   const [toast, setToast] = useState(initialToast);
   const displayName = userInfo?.name || 'Marketplace Member';
@@ -153,6 +154,46 @@ function ProfilePage() {
   function handleSignout() {
     signout();
     navigate('/', { replace: true });
+  }
+
+  async function handleDeleteAccount() {
+    if (!userInfo?._id || status.deletingAccount) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      'Delete your account permanently? This action cannot be undone.',
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setStatus((current) => ({
+      ...current,
+      deletingAccount: true,
+    }));
+
+    try {
+      const response = await fetch(`/api/users/profile/${userInfo._id}`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Unable to delete your account');
+      }
+
+      signout();
+      navigate('/', { replace: true });
+    } catch (error) {
+      setStatus((current) => ({
+        ...current,
+        deletingAccount: false,
+      }));
+      showToast('error', error.message || 'Something went wrong');
+    }
   }
 
   function openFilePicker() {
@@ -436,6 +477,15 @@ function ProfilePage() {
                 onClick={handleSignout}
               >
                 Sign out
+              </button>
+
+              <button
+                type="button"
+                className="profile-danger-action"
+                onClick={handleDeleteAccount}
+                disabled={status.deletingAccount}
+              >
+                {status.deletingAccount ? 'Deleting account...' : 'Delete account'}
               </button>
             </div>
           </article>

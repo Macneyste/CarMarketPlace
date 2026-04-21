@@ -249,10 +249,33 @@ async function updateUserProfile(req, res) {
   return res.status(200).json(buildAuthResponse(user));
 }
 
+async function deleteUserProfile(req, res) {
+  const { userId } = req.params;
+
+  if (!userId) {
+    res.status(400);
+    throw new Error('User ID is required');
+  }
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+
+  await User.findByIdAndDelete(userId);
+
+  return res.status(200).json({
+    message: 'User deleted successfully',
+  });
+}
+
 export {
   signupUser,
   signinUser,
   googleAuthUser,
   updateUserAvatar,
   updateUserProfile,
+  deleteUserProfile,
 };
