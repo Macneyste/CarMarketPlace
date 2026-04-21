@@ -7,6 +7,7 @@ import HomePage from './pages/HomePage';
 import InventoryPage from './pages/InventoryPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ProfilePage from './pages/ProfilePage';
+import SignoutPage from './pages/SignoutPage';
 import SigninPage from './pages/SigninPage';
 import SignupPage from './pages/SignupPage';
 
@@ -21,6 +22,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="profile" element={<ProfilePage />} />
         </Route>
+        <Route path="signout" element={<SignoutPage />} />
         <Route path="signin" element={<SigninPage />} />
         <Route path="signup" element={<SignupPage />} />
         <Route path="*" element={<NotFoundPage />} />

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import OAuthButton from '../components/OAuthButton';
 import Toast from '../components/Toast';
@@ -54,6 +54,20 @@ function SigninPage() {
   function hideToast() {
     setToast(initialToast);
   }
+
+  useEffect(() => {
+    const incomingToast = location.state?.toast;
+
+    if (!incomingToast?.message) {
+      return;
+    }
+
+    showToast(incomingToast.tone || 'success', incomingToast.message);
+    navigate(location.pathname, {
+      replace: true,
+      state: location.state?.from ? { from: location.state.from } : null,
+    });
+  }, [location.pathname, location.state, navigate]);
 
   function validateForm() {
     const trimmedEmail = formData.email.trim();

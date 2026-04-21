@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 
 const primaryLinks = [
@@ -8,7 +8,8 @@ const primaryLinks = [
 ];
 
 function Layout() {
-  const { isAuthenticated, signout, userInfo } = useAppContext();
+  const navigate = useNavigate();
+  const { isAuthenticated, userInfo } = useAppContext();
   const navigationLinks = isAuthenticated
     ? [...primaryLinks, { to: '/profile', label: 'Profile' }]
     : primaryLinks;
@@ -18,6 +19,10 @@ function Layout() {
   const sessionText = isAuthenticated
     ? userInfo?.email
     : 'Sign in to keep your account synced across the marketplace.';
+
+  function handleSignout() {
+    navigate('/signout');
+  }
 
   return (
     <div className="app-shell">
@@ -80,7 +85,7 @@ function Layout() {
                     <button
                       type="button"
                       className="header-signout"
-                      onClick={signout}
+                      onClick={handleSignout}
                     >
                       Sign out
                     </button>

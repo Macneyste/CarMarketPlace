@@ -152,8 +152,7 @@ function ProfilePage() {
   }
 
   function handleSignout() {
-    signout();
-    navigate('/', { replace: true });
+    navigate('/signout');
   }
 
   async function handleDeleteAccount() {
