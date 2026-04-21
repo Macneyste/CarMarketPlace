@@ -11,7 +11,7 @@ function Layout() {
   const navigate = useNavigate();
   const { isAuthenticated, userInfo } = useAppContext();
   const navigationLinks = isAuthenticated
-    ? [...primaryLinks, { to: '/profile', label: 'Profile' }]
+    ? [...primaryLinks, { to: '/sell', label: 'Sell' }, { to: '/profile', label: 'Profile' }]
     : primaryLinks;
   const sessionLabel = isAuthenticated
     ? `Welcome back, ${userInfo?.name?.split(' ')[0] || 'Driver'}`

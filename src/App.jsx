@@ -3,6 +3,7 @@ import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import AboutPage from './pages/AboutPage';
 import CarDetailsPage from './pages/CarDetailsPage';
+import CreateListingPage from './pages/CreateListingPage';
 import HomePage from './pages/HomePage';
 import InventoryPage from './pages/InventoryPage';
 import NotFoundPage from './pages/NotFoundPage';
@@ -21,6 +22,7 @@ function App() {
         <Route path="about" element={<AboutPage />} />
         <Route element={<ProtectedRoute />}>
           <Route path="profile" element={<ProfilePage />} />
+          <Route path="sell" element={<CreateListingPage />} />
         </Route>
         <Route path="signout" element={<SignoutPage />} />
         <Route path="signin" element={<SigninPage />} />

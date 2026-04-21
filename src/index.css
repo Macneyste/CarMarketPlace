@@ -641,11 +641,43 @@ a {
   outline: none;
 }
 
+.field select,
+.field textarea {
+  width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #f8fafc;
+  font: inherit;
+  outline: none;
+}
+
+.field select {
+  min-height: 54px;
+  padding: 0 1rem;
+}
+
+.field textarea {
+  min-height: 144px;
+  padding: 1rem;
+  resize: vertical;
+}
+
 .field input::placeholder {
   color: rgba(226, 232, 240, 0.42);
 }
 
+.field textarea::placeholder {
+  color: rgba(226, 232, 240, 0.42);
+}
+
 .field input:focus {
+  border-color: rgba(251, 146, 60, 0.72);
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.12);
+}
+
+.field select:focus,
+.field textarea:focus {
   border-color: rgba(251, 146, 60, 0.72);
   box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.12);
 }
@@ -751,6 +783,212 @@ a {
 
 .signup-link {
   color: #fdba74;
+}
+
+.listing-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.listing-intro,
+.listing-form-card,
+.inventory-empty-card,
+.listing-summary-card {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 28px;
+  box-shadow: 0 22px 60px rgba(15, 23, 42, 0.08);
+}
+
+.listing-intro,
+.inventory-empty-card {
+  background:
+    radial-gradient(circle at top left, rgba(249, 115, 22, 0.18), transparent 26%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.88), rgba(255, 247, 237, 0.88));
+}
+
+.listing-intro,
+.listing-form-card,
+.inventory-empty-card,
+.listing-summary-card {
+  padding: 2rem;
+}
+
+.listing-form-card,
+.listing-summary-card {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.98));
+  color: #f8fafc;
+}
+
+.listing-intro h1,
+.inventory-empty-card h2,
+.listing-summary-card h2 {
+  margin: 0.45rem 0 0.9rem;
+  letter-spacing: -0.04em;
+}
+
+.listing-intro h1 {
+  max-width: 12ch;
+  font-size: clamp(2.3rem, 5vw, 4.3rem);
+  line-height: 0.98;
+}
+
+.listing-intro p,
+.inventory-empty-card p {
+  color: #475569;
+}
+
+.listing-highlight-grid,
+.listing-form,
+.listing-summary-stack {
+  display: grid;
+  gap: 1rem;
+}
+
+.listing-highlight-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 2rem;
+}
+
+.listing-highlight-card {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid rgba(251, 146, 60, 0.14);
+}
+
+.listing-highlight-card p {
+  margin: 0;
+}
+
+.listing-intro-panel {
+  margin-top: 2rem;
+  padding: 1.2rem;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: #f8fafc;
+}
+
+.listing-intro-panel h2 {
+  margin: 0.45rem 0 0.8rem;
+  font-size: 1.7rem;
+}
+
+.listing-intro-panel p,
+.listing-footnote,
+.listing-summary-stack span {
+  margin: 0;
+  color: rgba(226, 232, 240, 0.72);
+}
+
+.listing-intro-label {
+  color: #fdba74;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.listing-form-grid,
+.inventory-meta-grid,
+.listing-spec-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.listing-form-footer {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.inventory-card {
+  gap: 1rem;
+}
+
+.inventory-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.inventory-price {
+  color: #0f172a;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.inventory-meta-grid {
+  color: #475569;
+  font-size: 0.94rem;
+}
+
+.inventory-owner {
+  color: #64748b;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.inventory-empty-card {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.listing-details-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.8fr);
+  gap: 1.5rem;
+}
+
+.listing-summary-card h2 {
+  font-size: clamp(1.8rem, 3vw, 2.3rem);
+}
+
+.listing-summary-card p {
+  color: rgba(226, 232, 240, 0.72);
+}
+
+.listing-summary-stack {
+  margin-top: 1.5rem;
+}
+
+.listing-summary-stack div,
+.listing-spec-grid div {
+  display: grid;
+  gap: 0.3rem;
+  padding: 1rem;
+  border-radius: 20px;
+}
+
+.listing-summary-stack div {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.listing-spec-grid {
+  margin: 1.5rem 0;
+}
+
+.listing-spec-grid div {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.listing-spec-grid span {
+  color: #64748b;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.listing-spec-grid strong {
+  color: #0f172a;
+  font-size: 1rem;
 }
 
 .profile-shell {
@@ -1137,6 +1375,8 @@ a {
   .hero,
   .card-grid,
   .signup-shell,
+  .listing-shell,
+  .listing-details-layout,
   .profile-hero,
   .profile-content-grid {
     grid-template-columns: 1fr;
@@ -1168,7 +1408,11 @@ a {
   .signup-trust-grid,
   .signup-showcase-metrics,
   .profile-facts-grid,
-  .profile-form-grid {
+  .profile-form-grid,
+  .listing-highlight-grid,
+  .listing-form-grid,
+  .inventory-meta-grid,
+  .listing-spec-grid {
     grid-template-columns: 1fr;
   }
 
