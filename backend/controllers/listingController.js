@@ -263,6 +263,36 @@ async function updateListing(req, res) {
   return res.status(200).json(populatedListing);
 }
 
+async function contactSeller(req, res) {
+  const { listingId } = req.params;
+  const { name, email, message } = req.body;
+  const trimmedName = name?.trim();
+  const trimmedEmail = email?.trim().toLowerCase();
+  const trimmedMessage = message?.trim();
+
+  if (!trimmedName || !trimmedEmail || !trimmedMessage) {
+    res.status(400);
+    throw new Error('Please provide your name, email, and message');
+  }
+
+  if (trimmedMessage.length < 20) {
+    res.status(400);
+    throw new Error('Message should be at least 20 characters');
+  }
+
+  const listing = await Listing.findById(listingId).populate('owner', 'name email');
+
+  if (!listing) {
+    res.status(404);
+    throw new Error('Listing not found');
+  }
+
+  return res.status(200).json({
+    message: `Your message has been prepared for ${listing.owner?.name || 'the seller'}.`,
+    sellerEmail: listing.owner?.email || '',
+  });
+}
+
 export {
   getListings,
   getUserListings,
@@ -270,4 +300,5 @@ export {
   createListing,
   deleteListing,
   updateListing,
+  contactSeller,
 };

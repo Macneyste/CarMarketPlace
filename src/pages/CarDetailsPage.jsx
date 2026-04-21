@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import Toast from '../components/Toast';
 import { useAppContext } from '../context/AppContext';
 import { fetchListingById } from '../utils/listingApi';
 import { formatMileage, formatPrice, getListingTitle } from '../utils/listings';
@@ -9,6 +10,19 @@ function CarDetailsPage() {
   const { userInfo } = useAppContext();
   const [listing, setListing] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [contactForm, setContactForm] = useState({
+    name: userInfo?.name || '',
+    email: userInfo?.email || '',
+    message: '',
+  });
+  const [contactStatus, setContactStatus] = useState({
+    sending: false,
+  });
+  const [toast, setToast] = useState({
+    open: false,
+    tone: 'success',
+    message: '',
+  });
   const [status, setStatus] = useState({
     loading: true,
     error: '',
@@ -49,6 +63,39 @@ function CarDetailsPage() {
     setActiveImageIndex(0);
   }, [listing?._id]);
 
+  useEffect(() => {
+    setContactForm((current) => ({
+      ...current,
+      name: userInfo?.name || '',
+      email: userInfo?.email || '',
+    }));
+  }, [userInfo?.name, userInfo?.email]);
+
+  function showToast(tone, message) {
+    setToast({
+      open: true,
+      tone,
+      message,
+    });
+  }
+
+  function hideToast() {
+    setToast({
+      open: false,
+      tone: 'success',
+      message: '',
+    });
+  }
+
+  function handleContactChange(event) {
+    const { name, value } = event.target;
+
+    setContactForm((current) => ({
+      ...current,
+      [name]: value,
+    }));
+  }
+
   if (status.loading) {
     return (
       <section className="details-card">
@@ -74,9 +121,60 @@ function CarDetailsPage() {
 
   const isOwner = userInfo?._id && userInfo._id === listing.owner?._id;
 
+  async function handleContactSubmit(event) {
+    event.preventDefault();
+
+    setContactStatus({
+      sending: true,
+    });
+    hideToast();
+
+    try {
+      const response = await fetch(`/api/listings/${listing._id}/contact`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: contactForm.name,
+          email: contactForm.email,
+          message: contactForm.message,
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Unable to send your seller message');
+      }
+
+      setContactStatus({
+        sending: false,
+      });
+      setContactForm((current) => ({
+        ...current,
+        message: '',
+      }));
+      showToast('success', data.message || 'Your message was sent successfully.');
+    } catch (error) {
+      setContactStatus({
+        sending: false,
+      });
+      showToast('error', error.message || 'Something went wrong');
+    }
+  }
+
   return (
-    <section className="listing-details-layout">
-      <article className="details-card">
+    <>
+      <Toast
+        open={toast.open}
+        tone={toast.tone}
+        message={toast.message}
+        onClose={hideToast}
+      />
+
+      <section className="listing-details-layout">
+        <article className="details-card">
         <span className="eyebrow">Vehicle details</span>
         <h1>{getListingTitle(listing)}</h1>
 
@@ -203,69 +301,120 @@ function CarDetailsPage() {
         <Link to="/inventory" className="text-link">
           Back to inventory
         </Link>
-      </article>
+        </article>
 
-      <aside className="listing-summary-card">
-        <span className="profile-card-label">Seller summary</span>
-        <div className="listing-seller-head">
-          <div className="listing-seller-avatar">
-            {listing.owner?.avatar ? (
-              <img
-                src={listing.owner.avatar}
-                alt={listing.owner?.name || 'Seller avatar'}
-                className="listing-seller-avatar-image"
-              />
-            ) : (
-              <span>
-                {(listing.owner?.name || 'Seller')
-                  .split(' ')
-                  .filter(Boolean)
-                  .slice(0, 2)
-                  .map((part) => part.charAt(0).toUpperCase())
-                  .join('')}
-              </span>
-            )}
+        <aside className="listing-summary-card">
+          <span className="profile-card-label">Seller summary</span>
+          <div className="listing-seller-head">
+            <div className="listing-seller-avatar">
+              {listing.owner?.avatar ? (
+                <img
+                  src={listing.owner.avatar}
+                  alt={listing.owner?.name || 'Seller avatar'}
+                  className="listing-seller-avatar-image"
+                />
+              ) : (
+                <span>
+                  {(listing.owner?.name || 'Seller')
+                    .split(' ')
+                    .filter(Boolean)
+                    .slice(0, 2)
+                    .map((part) => part.charAt(0).toUpperCase())
+                    .join('')}
+                </span>
+              )}
+            </div>
+
+            <div className="listing-seller-copy">
+              <h2>{listing.owner?.name || 'Marketplace Member'}</h2>
+              <span>{listing.location}</span>
+            </div>
           </div>
 
-          <div className="listing-seller-copy">
-            <h2>{listing.owner?.name || 'Marketplace Member'}</h2>
-            <span>{listing.location}</span>
-          </div>
-        </div>
+          <p>
+            This listing is live in the marketplace and ready for buyers to review
+            with a clearer detail layout.
+          </p>
 
-        <p>
-          This listing is live in the marketplace and ready for buyers to review
-          with a clearer detail layout.
-        </p>
-
-        <div className="listing-summary-stack">
-          <div>
-            <strong>Email</strong>
-            <span>{listing.owner?.email || 'No email available'}</span>
+          <div className="listing-summary-stack">
+            <div>
+              <strong>Email</strong>
+              <span>{listing.owner?.email || 'No email available'}</span>
+            </div>
+            <div>
+              <strong>Status</strong>
+              <span>{listing.status}</span>
+            </div>
+            <div>
+              <strong>Published</strong>
+              <span>{new Date(listing.createdAt).toLocaleDateString()}</span>
+            </div>
           </div>
-          <div>
-            <strong>Status</strong>
-            <span>{listing.status}</span>
-          </div>
-          <div>
-            <strong>Published</strong>
-            <span>{new Date(listing.createdAt).toLocaleDateString()}</span>
-          </div>
-        </div>
 
-        <div className="listing-summary-actions">
-          <Link to="/inventory" className="header-secondary-cta">
-            Browse more cars
-          </Link>
+          {!isOwner ? (
+            <form className="listing-contact-form" onSubmit={handleContactSubmit}>
+              <div className="listing-contact-header">
+                <span className="profile-card-label">Contact seller</span>
+                <h3>Send a direct message about this car</h3>
+              </div>
 
-          {isOwner ? (
-            <Link to={`/inventory/${listing._id}/edit`} className="header-cta">
-              Edit my listing
-            </Link>
+              <label className="field">
+                <span>Your name</span>
+                <input
+                  type="text"
+                  name="name"
+                  value={contactForm.name}
+                  onChange={handleContactChange}
+                  required
+                />
+              </label>
+
+              <label className="field">
+                <span>Your email</span>
+                <input
+                  type="email"
+                  name="email"
+                  value={contactForm.email}
+                  onChange={handleContactChange}
+                  required
+                />
+              </label>
+
+              <label className="field">
+                <span>Your message</span>
+                <textarea
+                  name="message"
+                  value={contactForm.message}
+                  onChange={handleContactChange}
+                  placeholder="Ask about condition, availability, or your preferred viewing time."
+                  minLength="20"
+                  required
+                />
+              </label>
+
+              <button
+                type="submit"
+                className="signup-submit"
+                disabled={contactStatus.sending}
+              >
+                {contactStatus.sending ? 'Sending message...' : 'Send message'}
+              </button>
+            </form>
           ) : null}
-        </div>
-      </aside>
-    </section>
+
+          <div className="listing-summary-actions">
+            <Link to="/inventory" className="header-secondary-cta">
+              Browse more cars
+            </Link>
+            {isOwner ? (
+              <Link to={`/inventory/${listing._id}/edit`} className="header-cta">
+                Edit my listing
+              </Link>
+            ) : null}
+          </div>
+        </aside>
+      </section>
+    </>
   );
 }
 
