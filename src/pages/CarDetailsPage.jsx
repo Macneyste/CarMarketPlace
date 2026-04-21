@@ -6,6 +6,7 @@ import { formatMileage, formatPrice, getListingTitle } from '../utils/listings';
 function CarDetailsPage() {
   const { carId = '' } = useParams();
   const [listing, setListing] = useState(null);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [status, setStatus] = useState({
     loading: true,
     error: '',
@@ -42,6 +43,10 @@ function CarDetailsPage() {
     };
   }, [carId]);
 
+  useEffect(() => {
+    setActiveImageIndex(0);
+  }, [listing?._id]);
+
   if (status.loading) {
     return (
       <section className="details-card">
@@ -72,15 +77,65 @@ function CarDetailsPage() {
         <h1>{getListingTitle(listing)}</h1>
 
         {listing.images?.length ? (
-          <div className="listing-gallery">
-            {listing.images.map((image, index) => (
+          <div className="listing-slider">
+            <div className="listing-slider-stage">
               <img
-                key={`${listing._id}-${index + 1}`}
-                src={image}
-                alt={`${getListingTitle(listing)} ${index + 1}`}
-                className="listing-gallery-image"
+                src={listing.images[activeImageIndex]}
+                alt={`${getListingTitle(listing)} ${activeImageIndex + 1}`}
+                className="listing-slider-image"
               />
-            ))}
+
+              {listing.images.length > 1 ? (
+                <>
+                  <button
+                    type="button"
+                    className="listing-slider-button listing-slider-button-left"
+                    onClick={() =>
+                      setActiveImageIndex((current) =>
+                        current === 0 ? listing.images.length - 1 : current - 1,
+                      )
+                    }
+                  >
+                    Prev
+                  </button>
+
+                  <button
+                    type="button"
+                    className="listing-slider-button listing-slider-button-right"
+                    onClick={() =>
+                      setActiveImageIndex((current) =>
+                        current === listing.images.length - 1 ? 0 : current + 1,
+                      )
+                    }
+                  >
+                    Next
+                  </button>
+                </>
+              ) : null}
+            </div>
+
+            {listing.images.length > 1 ? (
+              <div className="listing-slider-thumbs">
+                {listing.images.map((image, index) => (
+                  <button
+                    key={`${listing._id}-thumb-${index + 1}`}
+                    type="button"
+                    className={
+                      index === activeImageIndex
+                        ? 'listing-thumb listing-thumb-active'
+                        : 'listing-thumb'
+                    }
+                    onClick={() => setActiveImageIndex(index)}
+                  >
+                    <img
+                      src={image}
+                      alt={`${getListingTitle(listing)} thumbnail ${index + 1}`}
+                      className="listing-thumb-image"
+                    />
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </div>
         ) : (
           <div className="listing-gallery-empty">
