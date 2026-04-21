@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { fetchListingById } from '../utils/listingApi';
 import { formatMileage, formatPrice, getListingTitle } from '../utils/listings';
 
 function CarDetailsPage() {
@@ -15,12 +16,7 @@ function CarDetailsPage() {
 
     async function loadListing() {
       try {
-        const response = await fetch(`/api/listings/${carId}`);
-        const data = await response.json().catch(() => ({}));
-
-        if (!response.ok) {
-          throw new Error(data.message || 'Unable to load this listing');
-        }
+        const data = await fetchListingById(carId);
 
         if (!ignore) {
           setListing(data);
