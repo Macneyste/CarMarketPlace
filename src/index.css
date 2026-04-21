@@ -905,6 +905,56 @@ a {
   gap: 0.9rem;
 }
 
+.listing-ready-panel {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.listing-ready-copy {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.listing-ready-copy h3 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 1.25rem;
+  letter-spacing: -0.03em;
+}
+
+.listing-ready-copy p {
+  margin: 0;
+  color: rgba(226, 232, 240, 0.72);
+}
+
+.listing-ready-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.listing-ready-metrics div {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.9rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.listing-ready-metrics strong {
+  color: #f8fafc;
+  font-size: 1.05rem;
+}
+
+.listing-ready-metrics span {
+  color: rgba(226, 232, 240, 0.72);
+  font-size: 0.86rem;
+}
+
 .listing-upload-panel {
   display: grid;
   gap: 1rem;
@@ -1541,6 +1591,7 @@ a {
   .profile-form-grid,
   .listing-highlight-grid,
   .listing-form-grid,
+  .listing-ready-metrics,
   .listing-preview-grid,
   .inventory-meta-grid,
   .listing-gallery,

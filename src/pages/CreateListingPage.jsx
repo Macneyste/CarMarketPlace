@@ -25,6 +25,7 @@ const initialToast = {
 const MAX_LISTING_IMAGES = 5;
 const MAX_IMAGE_SIZE = 1_500_000;
 const supportedImageTypes = ['image/png', 'image/jpeg', 'image/webp'];
+const currentYear = new Date().getFullYear() + 1;
 
 const sellingPoints = [
   'Add a polished title and vehicle story',
@@ -51,6 +52,19 @@ function CreateListingPage() {
   });
   const [listingImages, setListingImages] = useState([]);
   const [toast, setToast] = useState(initialToast);
+  const formIsComplete =
+    formData.title.trim() &&
+    formData.make.trim() &&
+    formData.model.trim() &&
+    formData.year &&
+    formData.price &&
+    formData.mileage &&
+    formData.location.trim() &&
+    formData.description.trim();
+  const listingPreviewTitle =
+    formData.title.trim() ||
+    [formData.year, formData.make.trim(), formData.model.trim()].filter(Boolean).join(' ') ||
+    'Your listing preview';
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -122,6 +136,10 @@ function CreateListingPage() {
   }
 
   function validateForm() {
+    const parsedYear = Number(formData.year);
+    const parsedPrice = Number(formData.price);
+    const parsedMileage = Number(formData.mileage);
+
     if (
       !formData.title.trim() ||
       !formData.make.trim() ||
@@ -133,6 +151,26 @@ function CreateListingPage() {
       !formData.description.trim()
     ) {
       return 'Please fill in all listing fields';
+    }
+
+    if (
+      Number.isNaN(parsedYear) ||
+      parsedYear < 1950 ||
+      parsedYear > currentYear
+    ) {
+      return `Year must be between 1950 and ${currentYear}`;
+    }
+
+    if (Number.isNaN(parsedPrice) || parsedPrice <= 0) {
+      return 'Price must be greater than 0';
+    }
+
+    if (Number.isNaN(parsedMileage) || parsedMileage < 0) {
+      return 'Mileage must be 0 or higher';
+    }
+
+    if (formData.description.trim().length < 30) {
+      return 'Description should be at least 30 characters';
     }
 
     return '';
@@ -402,13 +440,43 @@ function CreateListingPage() {
                   No listing images selected yet.
                 </p>
               )}
+
+              <p className="listing-upload-empty">
+                {listingImages.length} / {MAX_LISTING_IMAGES} images selected
+              </p>
+            </div>
+
+            <div className="listing-ready-panel">
+              <div className="listing-ready-copy">
+                <span className="profile-card-label">Listing preview</span>
+                <h3>{listingPreviewTitle}</h3>
+                <p>
+                  Seller: {userInfo?.name || 'Marketplace Member'}.
+                  Location: {formData.location.trim() || 'Choose a location'}.
+                </p>
+              </div>
+
+              <div className="listing-ready-metrics">
+                <div>
+                  <strong>{formData.price || '0'}</strong>
+                  <span>Entered price</span>
+                </div>
+                <div>
+                  <strong>{formData.mileage || '0'}</strong>
+                  <span>Entered mileage</span>
+                </div>
+                <div>
+                  <strong>{listingImages.length}</strong>
+                  <span>Listing images</span>
+                </div>
+              </div>
             </div>
 
             <div className="listing-form-footer">
               <button
                 type="submit"
                 className="signup-submit"
-                disabled={status.submitting}
+                disabled={status.submitting || !formIsComplete}
               >
                 {status.submitting ? 'Publishing listing...' : 'Publish listing'}
               </button>
@@ -418,6 +486,12 @@ function CreateListingPage() {
                 <Link to="/inventory" className="text-link signup-link">
                   Browse inventory
                 </Link>
+              </p>
+
+              <p className="listing-footnote">
+                {formIsComplete
+                  ? 'Your listing has the required fields and is ready to publish.'
+                  : 'Complete all required fields before publishing your listing.'}
               </p>
             </div>
           </form>
