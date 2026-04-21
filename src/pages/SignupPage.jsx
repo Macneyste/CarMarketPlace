@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import OAuthButton from '../components/OAuthButton';
 import Toast from '../components/Toast';
 import { useAppContext } from '../context/AppContext';
 
@@ -75,6 +76,47 @@ function SignupPage() {
     }
 
     return '';
+  }
+
+  async function handleGoogleAuth(credential) {
+    setStatus({
+      loading: true,
+    });
+    hideToast();
+
+    try {
+      const response = await fetch('/api/users/google', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ credential }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Unable to continue with Google');
+      }
+
+      saveUser(data);
+      setStatus({
+        loading: false,
+      });
+      showToast(
+        'success',
+        `Welcome, ${data.name}. Your Google account is ready to go.`,
+      );
+
+      window.setTimeout(() => {
+        navigate('/inventory');
+      }, 1400);
+    } catch (error) {
+      setStatus({
+        loading: false,
+      });
+      showToast('error', error.message || 'Something went wrong');
+    }
   }
 
   async function handleSubmit(event) {
@@ -269,6 +311,17 @@ function SignupPage() {
             >
               {status.loading ? 'Creating account...' : 'Create my account'}
             </button>
+
+            <div className="auth-divider">
+              <span>or continue with</span>
+            </div>
+
+            <OAuthButton
+              mode="signup"
+              onSuccess={handleGoogleAuth}
+              onError={(message) => showToast('error', message)}
+              disabled={status.loading}
+            />
           </form>
 
           <p className="signup-footnote">
