@@ -74,6 +74,24 @@ function CarDetailsPage() {
       <article className="details-card">
         <span className="eyebrow">Vehicle details</span>
         <h1>{getListingTitle(listing)}</h1>
+
+        {listing.images?.length ? (
+          <div className="listing-gallery">
+            {listing.images.map((image, index) => (
+              <img
+                key={`${listing._id}-${index + 1}`}
+                src={image}
+                alt={`${getListingTitle(listing)} ${index + 1}`}
+                className="listing-gallery-image"
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="listing-gallery-empty">
+            No listing images have been uploaded for this car yet.
+          </div>
+        )}
+
         <p>{listing.description}</p>
 
         <div className="listing-spec-grid">

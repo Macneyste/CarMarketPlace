@@ -22,11 +22,25 @@ const initialToast = {
   message: '',
 };
 
+const MAX_LISTING_IMAGES = 5;
+const MAX_IMAGE_SIZE = 1_500_000;
+const supportedImageTypes = ['image/png', 'image/jpeg', 'image/webp'];
+
 const sellingPoints = [
   'Add a polished title and vehicle story',
   'Highlight mileage, location, and pricing clearly',
   'Publish a listing that looks ready for buyers immediately',
 ];
+
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('Unable to read this image file'));
+    reader.readAsDataURL(file);
+  });
+}
 
 function CreateListingPage() {
   const navigate = useNavigate();
@@ -35,6 +49,7 @@ function CreateListingPage() {
   const [status, setStatus] = useState({
     submitting: false,
   });
+  const [listingImages, setListingImages] = useState([]);
   const [toast, setToast] = useState(initialToast);
 
   function handleChange(event) {
@@ -56,6 +71,54 @@ function CreateListingPage() {
 
   function hideToast() {
     setToast(initialToast);
+  }
+
+  async function handleImageSelection(event) {
+    const files = Array.from(event.target.files || []);
+
+    if (!files.length) {
+      return;
+    }
+
+    if (listingImages.length + files.length > MAX_LISTING_IMAGES) {
+      showToast('error', 'You can upload up to 5 listing images');
+      event.target.value = '';
+      return;
+    }
+
+    const invalidFile = files.find(
+      (file) => !supportedImageTypes.includes(file.type) || file.size > MAX_IMAGE_SIZE,
+    );
+
+    if (invalidFile) {
+      showToast(
+        'error',
+        'Each image must be PNG, JPG, or WEBP and smaller than 1.5MB',
+      );
+      event.target.value = '';
+      return;
+    }
+
+    try {
+      const preparedImages = await Promise.all(
+        files.map(async (file, index) => ({
+          id: `${file.name}-${file.size}-${Date.now()}-${index}`,
+          name: file.name,
+          preview: await readFileAsDataUrl(file),
+        })),
+      );
+
+      setListingImages((current) => [...current, ...preparedImages]);
+      showToast('success', `${preparedImages.length} image selected for this listing.`);
+    } catch (error) {
+      showToast('error', error.message || 'Unable to load selected images');
+    } finally {
+      event.target.value = '';
+    }
+  }
+
+  function removeListingImage(imageId) {
+    setListingImages((current) => current.filter((image) => image.id !== imageId));
   }
 
   function validateForm() {
@@ -108,6 +171,7 @@ function CreateListingPage() {
           transmission: formData.transmission,
           location: formData.location.trim(),
           description: formData.description.trim(),
+          images: listingImages.map((image) => image.preview),
         }),
       });
 
@@ -121,6 +185,7 @@ function CreateListingPage() {
         submitting: false,
       });
       setFormData(initialForm);
+      setListingImages([]);
       showToast('success', 'Listing published successfully. Opening it now...');
 
       window.setTimeout(() => {
@@ -289,6 +354,55 @@ function CreateListingPage() {
                 onChange={handleChange}
               />
             </label>
+
+            <div className="listing-upload-panel">
+              <div className="listing-upload-header">
+                <span className="profile-card-label">Listing images</span>
+                <h3>Add photos that help the car stand out</h3>
+                <p>
+                  Upload up to 5 images. Supported types are PNG, JPG, and WEBP,
+                  each smaller than 1.5MB.
+                </p>
+              </div>
+
+              <label className="listing-upload-input">
+                <span>Choose listing images</span>
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  multiple
+                  onChange={handleImageSelection}
+                />
+              </label>
+
+              {listingImages.length ? (
+                <div className="listing-preview-grid">
+                  {listingImages.map((image) => (
+                    <article key={image.id} className="listing-preview-card">
+                      <img
+                        src={image.preview}
+                        alt={image.name}
+                        className="listing-preview-image"
+                      />
+                      <div className="listing-preview-copy">
+                        <span>{image.name}</span>
+                        <button
+                          type="button"
+                          className="listing-remove-image"
+                          onClick={() => removeListingImage(image.id)}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <p className="listing-upload-empty">
+                  No listing images selected yet.
+                </p>
+              )}
+            </div>
 
             <div className="listing-form-footer">
               <button

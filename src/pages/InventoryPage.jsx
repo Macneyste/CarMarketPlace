@@ -75,6 +75,16 @@ function InventoryPage() {
         <div className="card-grid">
           {listings.map((listing) => (
             <article key={listing._id} className="car-card inventory-card">
+              {listing.images?.[0] ? (
+                <img
+                  src={listing.images[0]}
+                  alt={getListingTitle(listing)}
+                  className="inventory-cover-image"
+                />
+              ) : (
+                <div className="inventory-cover-fallback">No image uploaded</div>
+              )}
+
               <div className="inventory-card-top">
                 <span className="car-year">{listing.year}</span>
                 <span className="inventory-price">{formatPrice(listing.price)}</span>

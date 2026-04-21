@@ -1,6 +1,30 @@
 import Listing from '../models/listingModel.js';
 import User from '../models/userModel.js';
 
+const listingImagePattern = /^data:image\/(png|jpeg|webp);base64,/i;
+
+function normalizeListingImages(images = []) {
+  if (!Array.isArray(images) || !images.length) {
+    return [];
+  }
+
+  if (images.length > 5) {
+    throw new Error('You can upload up to 5 listing images');
+  }
+
+  return images.map((image) => {
+    if (typeof image !== 'string' || !listingImagePattern.test(image.trim())) {
+      throw new Error('Listing images must be PNG, JPG, or WEBP files');
+    }
+
+    if (image.length > 2_500_000) {
+      throw new Error('One of the listing images is too large');
+    }
+
+    return image.trim();
+  });
+}
+
 function buildListingPayload(body = {}) {
   return {
     owner: body.owner,
@@ -14,7 +38,7 @@ function buildListingPayload(body = {}) {
     transmission: body.transmission?.trim(),
     location: body.location?.trim(),
     description: body.description?.trim(),
-    images: Array.isArray(body.images) ? body.images : [],
+    images: normalizeListingImages(body.images),
   };
 }
 

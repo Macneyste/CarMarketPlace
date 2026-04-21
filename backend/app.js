@@ -5,7 +5,7 @@ import userRoutes from './routes/userRoutes.js';
 
 const app = express();
 
-app.use(express.json({ limit: '3mb' }));
+app.use(express.json({ limit: '12mb' }));
 
 app.use('/api/users', userRoutes);
 app.use('/api/listings', listingRoutes);
