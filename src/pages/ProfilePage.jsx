@@ -296,9 +296,10 @@ function ProfilePage() {
       return;
     }
 
-    setStatus({
+    setStatus((current) => ({
+      ...current,
       uploading: true,
-    });
+    }));
     hideToast();
 
     try {
@@ -322,14 +323,16 @@ function ProfilePage() {
       saveUser(data);
       setPendingAvatar('');
       setPendingFileName('');
-      setStatus({
+      setStatus((current) => ({
+        ...current,
         uploading: false,
-      });
+      }));
       showToast('success', 'Profile image updated successfully.');
     } catch (error) {
-      setStatus({
+      setStatus((current) => ({
+        ...current,
         uploading: false,
-      });
+      }));
       showToast('error', error.message || 'Something went wrong');
     }
   }
