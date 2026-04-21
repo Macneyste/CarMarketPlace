@@ -3,6 +3,7 @@ import { NavLink, Outlet } from 'react-router-dom';
 const navLinks = [
   { to: '/', label: 'Home', end: true },
   { to: '/inventory', label: 'Inventory' },
+  { to: '/signup', label: 'Signup' },
   { to: '/about', label: 'About' },
 ];
 
@@ -36,8 +37,8 @@ function Layout() {
                 ))}
               </nav>
 
-              <NavLink to="/inventory" className="header-cta">
-                Browse Cars
+              <NavLink to="/signup" className="header-cta">
+                Create Account
               </NavLink>
             </div>
           </div>

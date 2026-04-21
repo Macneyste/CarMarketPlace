@@ -1,8 +1,11 @@
 :root {
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    sans-serif;
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', sans-serif;
   color: #1f2937;
-  background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+  background:
+    radial-gradient(circle at top left, rgba(251, 146, 60, 0.18), transparent 26%),
+    radial-gradient(circle at top right, rgba(244, 114, 182, 0.18), transparent 28%),
+    linear-gradient(180deg, #fffaf5 0%, #f8fafc 42%, #eef2ff 100%);
   line-height: 1.5;
   font-weight: 400;
 }
@@ -296,9 +299,260 @@ a {
   color: #1d4ed8;
 }
 
+.signup-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(360px, 0.9fr);
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.signup-intro,
+.signup-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 28px;
+  box-shadow: 0 22px 60px rgba(15, 23, 42, 0.08);
+}
+
+.signup-intro {
+  padding: 2.5rem;
+  background:
+    radial-gradient(circle at top left, rgba(249, 115, 22, 0.18), transparent 26%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.88), rgba(255, 247, 237, 0.88));
+}
+
+.signup-card {
+  padding: 2rem;
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.98));
+  color: #f8fafc;
+}
+
+.signup-intro h1,
+.signup-card h2 {
+  margin: 0.45rem 0 0.9rem;
+  letter-spacing: -0.04em;
+}
+
+.signup-intro h1 {
+  max-width: 12ch;
+  font-size: clamp(2.4rem, 5vw, 4.6rem);
+  line-height: 0.97;
+}
+
+.signup-intro p,
+.signup-card-header p,
+.signup-showcase-copy p,
+.signup-footnote {
+  color: #475569;
+}
+
+.signup-trust-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-top: 2rem;
+}
+
+.signup-trust-card {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid rgba(251, 146, 60, 0.14);
+}
+
+.signup-trust-card p {
+  margin: 0;
+  font-size: 0.96rem;
+  color: #334155;
+}
+
+.signup-trust-dot {
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #f97316, #ec4899);
+  box-shadow: 0 0 0 7px rgba(249, 115, 22, 0.1);
+}
+
+.signup-showcase {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: 2rem;
+  padding: 1.25rem;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: #f8fafc;
+}
+
+.signup-showcase-label {
+  display: inline-block;
+  margin-bottom: 0.45rem;
+  color: #fda4af;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.signup-showcase-copy h2 {
+  margin: 0;
+  font-size: 1.7rem;
+}
+
+.signup-showcase-copy p {
+  margin: 0.8rem 0 0;
+  color: rgba(226, 232, 240, 0.72);
+}
+
+.signup-showcase-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.signup-showcase-metrics div {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.95rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.signup-showcase-metrics strong {
+  font-size: 1.1rem;
+}
+
+.signup-showcase-metrics span {
+  color: rgba(226, 232, 240, 0.72);
+  font-size: 0.88rem;
+}
+
+.signup-card-header {
+  margin-bottom: 1.5rem;
+}
+
+.signup-card-header h2 {
+  font-size: clamp(2rem, 3vw, 2.6rem);
+}
+
+.signup-card-header p,
+.signup-footnote,
+.signup-switch {
+  color: rgba(226, 232, 240, 0.72);
+}
+
+.signup-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0 0.85rem;
+  border-radius: 999px;
+  background: rgba(251, 146, 60, 0.16);
+  color: #fdba74;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.signup-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.field span {
+  color: #e2e8f0;
+  font-weight: 700;
+}
+
+.field input {
+  width: 100%;
+  min-height: 54px;
+  padding: 0 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #f8fafc;
+  font: inherit;
+  outline: none;
+}
+
+.field input::placeholder {
+  color: rgba(226, 232, 240, 0.42);
+}
+
+.field input:focus {
+  border-color: rgba(251, 146, 60, 0.72);
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.12);
+}
+
+.signup-submit {
+  min-height: 56px;
+  border: 0;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #f97316, #ec4899);
+  color: #fff7ed;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 16px 36px rgba(236, 72, 153, 0.18);
+}
+
+.signup-submit:hover {
+  transform: translateY(-1px);
+}
+
+.signup-submit:disabled {
+  cursor: wait;
+  opacity: 0.8;
+}
+
+.form-message {
+  margin: 0;
+  padding: 0.9rem 1rem;
+  border-radius: 16px;
+  font-weight: 600;
+}
+
+.form-error {
+  background: rgba(239, 68, 68, 0.14);
+  color: #fecaca;
+  border: 1px solid rgba(239, 68, 68, 0.18);
+}
+
+.form-success {
+  background: rgba(34, 197, 94, 0.14);
+  color: #bbf7d0;
+  border: 1px solid rgba(34, 197, 94, 0.18);
+}
+
+.signup-footnote {
+  margin: 1rem 0 0;
+  font-size: 0.92rem;
+}
+
+.signup-switch {
+  margin: 1rem 0 0;
+}
+
+.signup-link {
+  color: #fdba74;
+}
+
 @media (max-width: 900px) {
   .hero,
-  .card-grid {
+  .card-grid,
+  .signup-shell {
     grid-template-columns: 1fr;
   }
 
@@ -313,6 +567,11 @@ a {
 
   .header-cta {
     width: 100%;
+  }
+
+  .signup-trust-grid,
+  .signup-showcase-metrics {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -329,5 +588,15 @@ a {
   .nav-link {
     flex: 1 1 auto;
     text-align: center;
+  }
+
+  .signup-intro,
+  .signup-card {
+    padding: 1.3rem;
+  }
+
+  .signup-intro h1 {
+    max-width: none;
+    font-size: 2.5rem;
   }
 }
